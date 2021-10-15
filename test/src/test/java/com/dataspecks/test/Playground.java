@@ -1,9 +1,9 @@
 package com.dataspecks.test;
 
 import com.dataspecks.commons.exception.ReflectionException;
-import com.dataspecks.proxy.base.handler.interceptor.adapter.RewireInterceptor;
-import com.dataspecks.proxy.base.handler.interceptor.adapter.RewireOperation;
-import com.dataspecks.proxy.base.handler.interceptor.adapter.ValueAdapter;
+import com.dataspecks.proxy.core.handler.interceptor.adapter.RewireInterceptor;
+import com.dataspecks.proxy.core.handler.interceptor.adapter.RewireOperation;
+import com.dataspecks.proxy.core.handler.interceptor.adapter.ValueAdapter;
 import com.dataspecks.proxy.library.helper.Builders;
 import org.junit.Test;
 

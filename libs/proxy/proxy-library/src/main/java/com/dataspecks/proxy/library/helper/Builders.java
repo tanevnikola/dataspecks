@@ -1,7 +1,7 @@
 package com.dataspecks.proxy.library.helper;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.proxy.base.ProxyBuilder;
+import com.dataspecks.proxy.core.ProxyBuilder;
 
 public class Builders<T> {
     private final Class<T> type;

@@ -1,13 +1,13 @@
 package com.dataspecks.proxy.library.helper;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.proxy.base.handler.InvocationHandler;
-import com.dataspecks.proxy.base.handler.RedirectInvocationHandler;
-import com.dataspecks.proxy.base.handler.RedirectInvocationHandlerBuilder;
-import com.dataspecks.proxy.base.handler.dynamic.DynamicInvocationHandler;
-import com.dataspecks.proxy.base.handler.dynamic.DynamicInvocationHandlerBuilder;
-import com.dataspecks.proxy.base.handler.interceptor.InterceptableInvocationHandler;
-import com.dataspecks.proxy.base.handler.interceptor.InterceptableInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.InvocationHandler;
+import com.dataspecks.proxy.core.handler.RedirectInvocationHandler;
+import com.dataspecks.proxy.core.handler.RedirectInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.dynamic.DynamicInvocationHandler;
+import com.dataspecks.proxy.core.handler.dynamic.DynamicInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandler;
+import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandlerBuilder;
 
 import java.util.function.Supplier;
 

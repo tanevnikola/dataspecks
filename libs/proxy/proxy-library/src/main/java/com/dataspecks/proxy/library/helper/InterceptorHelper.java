@@ -1,7 +1,7 @@
 package com.dataspecks.proxy.library.helper;
 
-import com.dataspecks.proxy.base.handler.interceptor.InterceptableInvocationHandler;
-import com.dataspecks.proxy.base.handler.interceptor.InterceptableInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandler;
+import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandlerBuilder;
 
 public class InterceptorHelper<T> {
     private final Class<T> type;
