@@ -2,8 +2,8 @@ package com.dataspecks.proxy.base.handler;
 
 import com.dataspecks.builder.exception.runtime.BuilderException;
 import com.dataspecks.commons.exception.unchecked.ArgueException;
-import com.dataspecks.proxy.base.ProxyBuilder;
 import com.dataspecks.proxy.base.AbstractTest;
+import com.dataspecks.proxy.base.ProxyBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 

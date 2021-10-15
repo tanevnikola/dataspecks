@@ -12,9 +12,7 @@ import java.lang.reflect.Method;
  * @param <T> proxy type
  * @param <U> fallback instance type
  */
-public interface FallbackRoutingStrategyBuilder<T, U> extends
-        Builder<FallbackRoutingStrategy<T, U>>,
-        RoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method> {
+public interface FallbackRoutingStrategyBuilder<T, U> extends RoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method> {
 
     /**
      * The strict mode is a simple parameter that dictates the behaviour when building the the router. If the

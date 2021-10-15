@@ -20,7 +20,7 @@ import java.util.Optional;
  *
  * @param <T> proxy type
  */
-public class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
+public final class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
     private InvocationHandler<T> iHandler = InvocationHandler.DeadEnd();
     private ArgumentsInterceptor aInterceptor = null;
     private ResultInterceptor<Object> rInterceptor = null;

@@ -6,7 +6,7 @@ import com.dataspecks.proxy.base.handler.InvocationHandler;
 
 /**
  *
- * @param <I> type of the instance being built
+ * @param <I> type of the instance being built - concrete implementation of {@link AbstractRoutingStrategy}
  * @param <T> proxy type
  * @param <K> routing key type
  */
