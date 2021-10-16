@@ -12,7 +12,7 @@ import java.util.Map;
  * A specialized {@link ArgumentsInterceptor} that uses argument indexes to find the {@link RewireOperation} for that
  * argument.
  */
-final class RewireInterceptor implements ArgumentsInterceptor  {
+final class RewireArgumentsInterceptor implements ArgumentsInterceptor  {
     private final Map<Integer, RewireOperation> rewireMap = new HashMap<>();
 
     /**
