@@ -1,8 +1,5 @@
 package com.dataspecks.proxy.core.handler.dynamic.routing;
 
-import com.dataspecks.builder.Builder;
-import com.dataspecks.builder.GenericBuilder;
-import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.exception.unchecked.DeadEndException;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
 import com.dataspecks.proxy.core.handler.dynamic.InvocationStrategy;
@@ -11,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Abstract strategy for routing the invocations based on a route key.
@@ -52,33 +48,4 @@ abstract class AbstractRoutingStrategy<T, K> implements InvocationStrategy<T> {
      * @return route key
      */
     public abstract K getRouteKey(Object proxy, Method method, Object... args);
-
-    /**
-     * Abstract builder to build derived strategies from {@link AbstractRoutingStrategy}
-     *
-     * @param <I> type of the object we want to build. Must inherit {@link AbstractRoutingStrategy}
-     * @param <T> proxy type
-     * @param <K> route key
-     */
-    protected static abstract class AbstractBuilder<I extends AbstractRoutingStrategy<T, K>, T, K> extends GenericBuilder<I>
-            implements RoutingStrategyBuilder<I, T, K> {
-        public AbstractBuilder(Supplier<I> instanceSupplier) {
-            super(instanceSupplier);
-        }
-
-        /**
-         * Returns a {@link BuildOptions.Set} to be invoked with a {@link InvocationHandler} builder. This will register
-         * the invocation handler to the provided route key
-         *
-         * @param key route key
-         * @return {@link BuildOptions.Set}
-         */
-        @Override
-        public BuildOptions.Set<RoutingStrategyBuilder<I, T, K>, Builder<? extends InvocationHandler<T>>> withRoute(K key) {
-            return iHandlerBuilder -> {
-                configure(aRStrategy -> aRStrategy.iHandlerMap.put(key, iHandlerBuilder.build()));
-                return this;
-            };
-        }
-    }
 }

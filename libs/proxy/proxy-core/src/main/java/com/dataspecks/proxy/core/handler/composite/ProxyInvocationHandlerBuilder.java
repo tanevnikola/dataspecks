@@ -1,8 +1,8 @@
 package com.dataspecks.proxy.core.handler.composite;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.proxy.core.handler.RedirectInvocationHandlerBuildContract;
-import com.dataspecks.proxy.core.handler.dynamic.DynamicInvocationHandlerBuildContract;
+import com.dataspecks.proxy.core.builder.contract.handler.RedirectInvocationHandlerBuildContract;
+import com.dataspecks.proxy.core.builder.contract.handler.dynamic.DynamicInvocationHandlerBuildContract;
 import com.dataspecks.proxy.core.handler.dynamic.InvocationStrategy;
 
 import java.lang.reflect.Method;

@@ -14,7 +14,7 @@ public class StrategyHelper<T> {
     }
 
     public <U> FallbackRoutingStrategyBuilder<T, U> Fallback(U target) {
-        return FallbackRoutingStrategyBuilder.create(type, target);
+        return new FallbackRoutingStrategyBuilder<>(type, target);
     }
 
 }

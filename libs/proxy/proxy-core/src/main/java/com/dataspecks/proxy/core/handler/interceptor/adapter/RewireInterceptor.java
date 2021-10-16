@@ -1,7 +1,5 @@
 package com.dataspecks.proxy.core.handler.interceptor.adapter;
 
-import com.dataspecks.builder.GenericBuilder;
-import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.handler.interceptor.ArgumentsInterceptor;
 
 import java.lang.reflect.Method;
@@ -17,7 +15,14 @@ import java.util.Map;
 final class RewireInterceptor implements ArgumentsInterceptor  {
     private final Map<Integer, RewireOperation> rewireMap = new HashMap<>();
 
-    private RewireInterceptor() {}
+    /**
+     * Sets a {@link RewireOperation} to be applied for specific argument
+     * @param index the index of the argument we want the operation to be applied to
+     * @param operation the {@link RewireOperation} to be applied
+     */
+    public void setOperationForArgument(int index, RewireOperation operation) {
+        rewireMap.put(index, operation);
+    }
 
     @Override
     public Object[] intercept(Object proxy, Method method, Object... args) throws Throwable {
@@ -26,24 +31,5 @@ final class RewireInterceptor implements ArgumentsInterceptor  {
             result.add(rewireMap.get(key).perform(args));
         }
         return result.toArray();
-    }
-
-    /**
-     * Concrete builder
-     */
-    public static final class BuilderImpl extends GenericBuilder<RewireInterceptor>
-            implements RewireInterceptorBuilder {
-
-        public BuilderImpl() {
-            super(RewireInterceptor::new);
-        }
-
-        public BuildOptions.Set<RewireInterceptorBuilder, RewireOperation> forArgument(int index) {
-
-            return rewire -> {
-                configure(rInterceptor -> rInterceptor.rewireMap.put(index, rewire));
-                return this;
-            };
-        }
     }
 }

@@ -1,12 +1,8 @@
 package com.dataspecks.proxy.core.handler.dynamic;
 
-import com.dataspecks.builder.Builder;
-import com.dataspecks.builder.GenericBuilder;
-import com.dataspecks.commons.exception.DException;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -17,6 +13,22 @@ import java.util.Optional;
  */
 final class DynamicInvocationHandler<T> implements InvocationHandler<T> {
     private InvocationStrategy<T> iStrategy = InvocationStrategy.DeadEnd();
+
+    /**
+     * get the invocation strategy
+     * @return {@link InvocationStrategy}
+     */
+    public InvocationStrategy<T> getiStrategy() {
+        return iStrategy;
+    }
+
+    /**
+     * set an invocation strategy
+     * @param iStrategy {@link InvocationStrategy} to be set
+     */
+    public void setiStrategy(InvocationStrategy<T> iStrategy) {
+        this.iStrategy = iStrategy;
+    }
 
     /**
      * Override of the {@link InvocationHandler#invoke(Object, Method, Object[])} method that uses a strategy to resolve
@@ -35,33 +47,5 @@ final class DynamicInvocationHandler<T> implements InvocationHandler<T> {
                 .invoke(proxy, method, args);
         iStrategy.processResult(result);
         return result;
-    }
-
-    /**
-     * Concrete builder
-     * @param <T> proxy type
-     */
-    public static final class BuilderImpl<T> extends GenericBuilder<DynamicInvocationHandler<T>>
-            implements DynamicInvocationHandlerBuilder<T> {
-
-        public BuilderImpl() {
-            super(DynamicInvocationHandler::new);
-        }
-
-        public DynamicInvocationHandlerBuilder<T> setStrategy(Builder<? extends InvocationStrategy<T>> iSBuilder) {
-            DException.argue(Objects.nonNull(iSBuilder));
-            configure(dIHandler -> dIHandler.iStrategy = iSBuilder.build());
-            return this;
-        }
-
-        /**
-         * Validate the instance
-         * @param dIHandler {@link DynamicInvocationHandler}
-         * @return {@link DynamicInvocationHandler
-         */
-        protected DynamicInvocationHandler<T> validate(DynamicInvocationHandler<T> dIHandler) {
-            DException.argue(Objects.nonNull(dIHandler.iStrategy));
-            return super.validate(dIHandler);
-        }
     }
 }

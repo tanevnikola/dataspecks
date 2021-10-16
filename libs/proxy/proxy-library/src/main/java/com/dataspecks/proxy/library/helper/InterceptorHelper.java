@@ -14,6 +14,6 @@ public class InterceptorHelper<T> {
     }
 
     public InterceptableInvocationHandlerBuilder<T> Interceptable() {
-        return InterceptableInvocationHandlerBuilder.<T>create();
+        return new InterceptableInvocationHandlerBuilder<>();
     }
 }

@@ -29,7 +29,7 @@ public class Playground {
                 .setStrategy(builders.Strategy.Fallback(dummyClass)
                         .forMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class, String.class).set(
                                 builders.InvocationHandler.Interceptable()
-                                        .setArgumentsInterceptor(RewireInterceptorBuilder.create()
+                                        .setArgumentsInterceptor(new RewireInterceptorBuilder()
                                                 .forArgument(0).set(RewireOperation.withArguments(0, 1, 2).set(ValueAdapter.Concatenate)))
                                         .setHandler(builders.InvocationHandler.Redirect(dummyClass)
                                                 .setMethod(M_TEST_ARGUMENT_REWIRE, String.class)))
@@ -37,7 +37,7 @@ public class Playground {
                         .forMethod(M_TEST_ARGUMENT_REWIRE, Boolean.class, Integer.class).set(
                                 builders.InvocationHandler.Interceptable()
                                         .setResultInterceptor(ValueAdapter.PassThrough)
-                                        .setArgumentsInterceptor(RewireInterceptorBuilder.create()
+                                        .setArgumentsInterceptor(new RewireInterceptorBuilder()
                                                 .forArgument(0).set(RewireOperation.withArguments(1).set(ValueAdapter.trivial(1)))
                                                 .forArgument(1).set(RewireOperation.trivial(true))
                                                 .forArgument(2).set(RewireOperation.withArguments(1, 0 ).set(ValueAdapter.Concatenate)))
@@ -46,7 +46,7 @@ public class Playground {
                         .forMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class).set(
                                 builders.InvocationHandler.Interceptable()
                                         .setResultInterceptor(ValueAdapter.PassThrough)
-                                        .setArgumentsInterceptor(RewireInterceptorBuilder.create()
+                                        .setArgumentsInterceptor(new RewireInterceptorBuilder()
                                                 .forArgument(0).set(RewireOperation.withArguments(1).set(ValueAdapter.trivial(1)))
                                                 .forArgument(1).set(RewireOperation.trivial(true))
                                                 .forArgument(2).set(RewireOperation.withArguments(1, 0 ).set(ValueAdapter.using(ValueAdapter.PassThrough))))

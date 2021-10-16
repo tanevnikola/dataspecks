@@ -1,12 +1,8 @@
 package com.dataspecks.proxy.core.handler.interceptor;
 
-import com.dataspecks.builder.Builder;
-import com.dataspecks.builder.GenericBuilder;
-import com.dataspecks.commons.exception.DException;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -25,7 +21,53 @@ final class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
     private ArgumentsInterceptor aInterceptor = null;
     private ResultInterceptor<Object> rInterceptor = null;
 
-    private InterceptableInvocationHandler() {}
+    /**
+     * get invocation handler
+     * @return {@link InvocationHandler}
+     */
+    public InvocationHandler<T> getiHandler() {
+        return iHandler;
+    }
+
+    /**
+     * set invocation handler
+     * @param iHandler {@link InvocationHandler}
+     */
+    public void setiHandler(InvocationHandler<T> iHandler) {
+        this.iHandler = iHandler;
+    }
+
+    /**
+     * get arguments interceptor
+     * @return {@link ArgumentsInterceptor}
+     */
+    public ArgumentsInterceptor getaInterceptor() {
+        return aInterceptor;
+    }
+
+    /**
+     * set arguments interceptor
+     * @param aInterceptor {@link ArgumentsInterceptor}
+     */
+    public void setaInterceptor(ArgumentsInterceptor aInterceptor) {
+        this.aInterceptor = aInterceptor;
+    }
+
+    /**
+     * get result interceptor
+     * @return {@link ResultInterceptor}
+     */
+    public ResultInterceptor<Object> getrInterceptor() {
+        return rInterceptor;
+    }
+
+    /**
+     * set result interceptor
+     * @param rInterceptor {@link ResultInterceptor}
+     */
+    public void setrInterceptor(ResultInterceptor<Object> rInterceptor) {
+        this.rInterceptor = rInterceptor;
+    }
 
     /**
      * Implementation of the {@link java.lang.reflect.InvocationHandler#invoke(Object, Method, Object[])} contract
@@ -49,62 +91,4 @@ final class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
                 iHandler.invoke(proxy, method, aInterceptor.intercept(proxy, method, args)));
     }
 
-    /**
-     * Concrete builder
-     * @param <T> proxy type
-     */
-    public static class BuilderImpl<T> extends GenericBuilder<InterceptableInvocationHandler<T>>
-            implements InterceptableInvocationHandlerBuilder<T>{
-
-        public BuilderImpl() {
-            super(InterceptableInvocationHandler::new);
-        }
-
-        /**
-         * Set the {@link InvocationHandler} and return the builder to chain build options.
-         *
-         * @param iHBuilder {@link com.dataspecks.builder.Builder<InvocationHandler>}
-         * @return {@link BuilderImpl}
-         */
-        public InterceptableInvocationHandlerBuilder<T> setHandler(final Builder<? extends InvocationHandler<T>> iHBuilder) {
-            DException.argue(Objects.nonNull(iHBuilder));
-            configure(iIH -> iIH.iHandler = iHBuilder.build());
-            return this;
-        }
-
-        /**
-         * Set the {@link ArgumentsInterceptor} and return the builder to chain build options.
-         *
-         * @param aIBuilder {@link com.dataspecks.builder.Builder<ArgumentsInterceptor>}
-         * @return {@link BuilderImpl}
-         */
-        public InterceptableInvocationHandlerBuilder<T> setArgumentsInterceptor(final Builder<? extends ArgumentsInterceptor> aIBuilder) {
-            DException.argue(Objects.nonNull(aIBuilder));
-            configure(iIH -> iIH.aInterceptor = aIBuilder.build());
-            return this;
-        }
-
-        /**
-         * Set the {@link ResultInterceptor} and return the builder to chain build options.
-         *
-         * @param rInterceptor {@link ResultInterceptor<Object>}
-         * @return {@link BuilderImpl}
-         */
-        public InterceptableInvocationHandlerBuilder<T> setResultInterceptor(final ResultInterceptor<Object> rInterceptor) {
-            DException.argue(Objects.nonNull(rInterceptor));
-            configure(iIH -> iIH.rInterceptor = rInterceptor);
-            return this;
-        }
-
-        /**
-         * Perform instance validation
-         *
-         * @param iIHandler {@link InterceptableInvocationHandler}
-         * @return {@link InterceptableInvocationHandler}
-         */
-        protected InterceptableInvocationHandler<T> validate(InterceptableInvocationHandler<T> iIHandler) {
-            DException.argue(Objects.nonNull(iIHandler.iHandler), "Invocation handler cannot be null");
-            return iIHandler;
-        }
-    }
 }

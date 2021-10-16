@@ -24,7 +24,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public <U> RedirectInvocationHandlerBuilder<T, U> Redirect(U target) {
-        return RedirectInvocationHandlerBuilder.create(target);
+        return new RedirectInvocationHandlerBuilder<>(target);
     }
 
     /*******************************************************************************************************************
@@ -32,7 +32,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public DynamicInvocationHandlerBuilder<T> Dynamic() {
-        return DynamicInvocationHandlerBuilder.create();
+        return new DynamicInvocationHandlerBuilder<>();
     }
 
 
@@ -41,7 +41,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public InterceptableInvocationHandlerBuilder<T> Interceptable() {
-        return InterceptableInvocationHandlerBuilder.create();
+        return new InterceptableInvocationHandlerBuilder<>();
     }
 
     /*******************************************************************************************************************

@@ -14,14 +14,14 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     @Test(expected = ArgueException.class)
     public void nullTargetInstanceProvided() {
         validateExceptionMessage("Target instance cannot be null",
-                () -> RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(null)
+                () -> new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(null)
                         .build());
     }
 
     @Test(expected = ArgueException.class)
     public void nullTargetMethodProvided() {
         validateExceptionMessage("Target method cannot be null",
-                () -> RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                () -> new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .build());
     }
 
@@ -29,7 +29,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     public void redirectSuccessfulWithMethodProvided() throws NoSuchMethodException {
         Method m = TestClass.class.getMethod("getTestValue");
         RedirectInvocationHandlerBuilder<TestInterface, TestClass> ihBuilder =
-                RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                 .setMethod(m);
 
         TestInterface testInterface = new ProxyBuilder<>(TestInterface.class)
@@ -42,7 +42,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     public void methodDeclaringClassDifferentThanTargetInstanceClass() throws NoSuchMethodException {
         Method m = TestInterface.class.getMethod("getTestValue");
         validateExceptionMessage("Target target method's declaring class is different than the target's instance class",
-                () -> RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                () -> new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .setMethod(m).build());
 
     }
@@ -50,7 +50,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     @Test
     public void redirectSuccessfulWithMethodLookup() {
         RedirectInvocationHandlerBuilder<TestInterface, TestClass> ihBuilder =
-                RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .setMethod("getTestValue");
         TestInterface testInterface = new ProxyBuilder<>(TestInterface.class)
                 .setHandler(ihBuilder)
@@ -61,7 +61,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     @Test(expected = BuilderException.class)
     public void methodNotFoundWithMethodLookup() {
         validateExceptionMessage("Failed to configure instance 'class com.dataspecks.proxy.core.handler.RedirectInvocationHandler'",
-                () -> RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                () -> new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .setMethod("asd")
                         .build());
     }
@@ -69,7 +69,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     @Test(expected = BuilderException.class)
     public void methodNotFound() {
         validateExceptionMessage("Failed to configure instance 'class com.dataspecks.proxy.core.handler.RedirectInvocationHandler'",
-                () -> RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                () -> new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .setMethod("asd")
                         .build());
     }
@@ -77,7 +77,7 @@ public class RedirectInvocationHandlerTest extends AbstractTest {
     @Test(expected = IllegalArgumentException.class)
     public void wrongNumberOfArguments() {
         RedirectInvocationHandlerBuilder<TestInterface, TestClass> ihBuilder =
-                RedirectInvocationHandlerBuilder.<TestInterface, TestClass>create(new TestClass())
+                new RedirectInvocationHandlerBuilder<TestInterface, TestClass>(new TestClass())
                         .setMethod("setTestValue", String.class);
         TestInterface testInterface = new ProxyBuilder<>(TestInterface.class)
                 .setHandler(ihBuilder)

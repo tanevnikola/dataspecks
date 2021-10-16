@@ -1,12 +1,26 @@
 package com.dataspecks.proxy.core.handler.interceptor.adapter;
 
 import com.dataspecks.builder.Builder;
+import com.dataspecks.builder.GenericBuilder;
+import com.dataspecks.proxy.core.builder.BuildOptions;
+import com.dataspecks.proxy.core.builder.contract.handler.interceptor.adapter.RewireInterceptorBuildContract;
 
-public interface RewireInterceptorBuilder extends
-        Builder<RewireInterceptor>,
+/**
+ * Concrete builder
+ */
+public final class RewireInterceptorBuilder extends GenericBuilder<RewireInterceptor>
+        implements Builder<RewireInterceptor>,
         RewireInterceptorBuildContract<RewireInterceptorBuilder> {
 
-    static RewireInterceptorBuilder create() {
-        return new RewireInterceptor.BuilderImpl();
+    public RewireInterceptorBuilder() {
+        super(RewireInterceptor::new);
+    }
+
+    public BuildOptions.Set<RewireInterceptorBuilder, RewireOperation> forArgument(int index) {
+
+        return rewire -> {
+            configure(rInterceptor -> rInterceptor.setOperationForArgument(index, rewire));
+            return this;
+        };
     }
 }

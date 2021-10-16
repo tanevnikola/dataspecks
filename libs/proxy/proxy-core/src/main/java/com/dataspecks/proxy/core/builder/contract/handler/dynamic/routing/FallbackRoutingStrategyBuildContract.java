@@ -1,4 +1,4 @@
-package com.dataspecks.proxy.core.handler.dynamic.routing;
+package com.dataspecks.proxy.core.builder.contract.handler.dynamic.routing;
 
 import com.dataspecks.builder.Builder;
 import com.dataspecks.commons.exception.ReflectionException;

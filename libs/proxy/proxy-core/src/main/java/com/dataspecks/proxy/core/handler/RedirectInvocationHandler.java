@@ -1,11 +1,8 @@
 package com.dataspecks.proxy.core.handler;
 
-import com.dataspecks.builder.GenericBuilder;
-import com.dataspecks.commons.exception.DException;
 import com.dataspecks.commons.reflection.Methods;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 /**
  * Redirects the method invocation to a target method on a target instance. The method signatures must be compatible
@@ -16,7 +13,37 @@ final class RedirectInvocationHandler<T, U> implements InvocationHandler<T> {
     private U targetI = null;
     private Method targetM = null;
 
-    private RedirectInvocationHandler() {}
+    /**
+     * get target instance
+     * @return target instance
+     */
+    public U getTargetI() {
+        return targetI;
+    }
+
+    /**
+     * set target instance
+     * @param targetI target instance
+     */
+    public void setTargetI(U targetI) {
+        this.targetI = targetI;
+    }
+
+    /**
+     * get target method
+     * @return target method
+     */
+    public Method getTargetM() {
+        return targetM;
+    }
+
+    /**
+     * set target method
+     * @param targetM target method
+     */
+    public void setTargetM(Method targetM) {
+        this.targetM = targetM;
+    }
 
     /**
      * Invokes the target method from the target instance with the provided arguments
@@ -32,43 +59,5 @@ final class RedirectInvocationHandler<T, U> implements InvocationHandler<T> {
         return Methods.invoke(targetM, targetI, args);
     }
 
-    /**
-     * Concrete builder
-     * @param <T> proxy type
-     * @param <U> instance type
-     */
-    public static class BuilderImpl<T, U> extends GenericBuilder<RedirectInvocationHandler<T, U>>
-            implements RedirectInvocationHandlerBuilder<T, U> {
 
-        public BuilderImpl(U targetI) {
-            super(RedirectInvocationHandler::new);
-            configure(rIHandler -> rIHandler.targetI = targetI);
-        }
-
-        public RedirectInvocationHandlerBuilder<T, U> setMethod(String name, Class<?>... args) {
-            configure(rIHandler -> rIHandler.targetM = Methods.lookup(rIHandler.targetI.getClass(), name, args));
-            return this;
-        }
-
-        public RedirectInvocationHandlerBuilder<T, U> setMethod(Method method) {
-            configure(rIHandler -> rIHandler.targetM = method);
-            return this;
-        }
-
-        /**
-         * Perform instance validation. Both target instance and target method must no be null. Additionally the target
-         * method's declaring class my be the target instance class.
-         *
-         * @param rIHandler {@link RedirectInvocationHandler}
-         * @return {@link RedirectInvocationHandler}
-         */
-        @Override
-        protected RedirectInvocationHandler<T, U> validate(RedirectInvocationHandler<T, U> rIHandler) {
-            DException.argue(Objects.nonNull(rIHandler.targetI), "Target instance cannot be null");
-            DException.argue(Objects.nonNull(rIHandler.targetM), "Target method cannot be null");
-            DException.argue(rIHandler.targetM.getDeclaringClass().equals(rIHandler.targetI.getClass()),
-                    "Target target method's declaring class is different than the target's instance class");
-            return super.validate(rIHandler);
-        }
-    }
 }
