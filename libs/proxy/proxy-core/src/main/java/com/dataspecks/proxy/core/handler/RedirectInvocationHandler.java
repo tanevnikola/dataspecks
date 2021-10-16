@@ -4,11 +4,6 @@ import com.dataspecks.commons.reflection.Methods;
 
 import java.lang.reflect.Method;
 
-/**
- * Redirects the method invocation to a target method on a target instance. The method signatures must be compatible
- *
- * @param <U> target instance type
- */
 final class RedirectInvocationHandler<T, U> implements InvocationHandler<T> {
     private U targetI = null;
     private Method targetM = null;

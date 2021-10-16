@@ -4,6 +4,7 @@ import com.dataspecks.builder.Builder;
 import com.dataspecks.builder.GenericBuilder;
 import com.dataspecks.commons.exception.DException;
 import com.dataspecks.proxy.core.builder.contract.handler.dynamic.DynamicInvocationHandlerBuildContract;
+import com.dataspecks.proxy.core.handler.InvocationHandler;
 
 import java.util.Objects;
 
@@ -12,8 +13,8 @@ import java.util.Objects;
  * @param <T> proxy type
  */
 public final class DynamicInvocationHandlerBuilder<T>
-        extends GenericBuilder<DynamicInvocationHandler<T>>
-        implements  Builder<DynamicInvocationHandler<T>>, DynamicInvocationHandlerBuildContract<T, DynamicInvocationHandlerBuilder<T>> {
+        extends GenericBuilder<InvocationHandler<T>, DynamicInvocationHandler<T>>
+        implements DynamicInvocationHandlerBuildContract<T, DynamicInvocationHandlerBuilder<T>> {
 
     public DynamicInvocationHandlerBuilder() {
         super(DynamicInvocationHandler::new);

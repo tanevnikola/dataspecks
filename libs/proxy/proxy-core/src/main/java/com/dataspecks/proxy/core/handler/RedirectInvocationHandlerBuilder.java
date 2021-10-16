@@ -1,6 +1,5 @@
 package com.dataspecks.proxy.core.handler;
 
-import com.dataspecks.builder.Builder;
 import com.dataspecks.builder.GenericBuilder;
 import com.dataspecks.commons.exception.DException;
 import com.dataspecks.commons.reflection.Methods;
@@ -10,13 +9,14 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * Concrete builder
+ * Build an {@link InvocationHandler} that redirects the method invocation to a target method on a target instance.
+ *
  * @param <T> proxy type
- * @param <U> instance type
+ * @param <U> target instance type
  */
 public class RedirectInvocationHandlerBuilder<T, U>
-        extends GenericBuilder<RedirectInvocationHandler<T, U>>
-        implements Builder<RedirectInvocationHandler<T, U>>, RedirectInvocationHandlerBuildContract<T, RedirectInvocationHandlerBuilder<T, U>> {
+        extends GenericBuilder<InvocationHandler<T>, RedirectInvocationHandler<T, U>>
+        implements RedirectInvocationHandlerBuildContract<T, RedirectInvocationHandlerBuilder<T, U>> {
 
     public RedirectInvocationHandlerBuilder(U targetI) {
         super(RedirectInvocationHandler::new);
@@ -48,8 +48,4 @@ public class RedirectInvocationHandlerBuilder<T, U>
                 "Target target method's declaring class is different than the target's instance class");
         return super.validate(rIHandler);
     }
-
-//    public static <T, U> RedirectInvocationHandlerBuilder<T, U> create(U targetI) {
-//        return new RedirectInvocationHandlerBuilder<T, U>(targetI);
-//    }
 }

@@ -51,7 +51,7 @@ public class ImmutableDummyClass {
         return Objects.toString(c);
     }
 
-    public static class Builder extends GenericBuilder<ImmutableDummyClass> {
+    public static class Builder extends GenericBuilder<ImmutableDummyClass, ImmutableDummyClass> {
         Builder() {
             super(ImmutableDummyClass::new);
         }

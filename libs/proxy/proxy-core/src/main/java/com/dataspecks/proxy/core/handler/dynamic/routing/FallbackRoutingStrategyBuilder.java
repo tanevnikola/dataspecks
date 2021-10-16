@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class FallbackRoutingStrategyBuilder<T, U>
         extends AbstractRoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method>
-        implements FallbackRoutingStrategyBuildContract<T, FallbackRoutingStrategyBuilder<T, U>>, Builder<FallbackRoutingStrategy<T, U>> {
+        implements FallbackRoutingStrategyBuildContract<T, FallbackRoutingStrategyBuilder<T, U>> {
 
     private final Class<T> type;
     private Boolean strictMode = false;

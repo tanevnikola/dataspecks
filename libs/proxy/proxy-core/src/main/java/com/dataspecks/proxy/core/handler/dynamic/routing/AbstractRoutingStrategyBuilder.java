@@ -4,6 +4,7 @@ import com.dataspecks.builder.Builder;
 import com.dataspecks.builder.GenericBuilder;
 import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
+import com.dataspecks.proxy.core.handler.dynamic.InvocationStrategy;
 
 import java.util.function.Supplier;
 
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
  * @param <T> proxy type
  * @param <K> route key
  */
-abstract class AbstractRoutingStrategyBuilder<I extends AbstractRoutingStrategy<T, K>, T, K> extends GenericBuilder<I> {
+abstract class AbstractRoutingStrategyBuilder<I extends AbstractRoutingStrategy<T, K>, T, K> extends GenericBuilder<InvocationStrategy<T>, I> {
     public AbstractRoutingStrategyBuilder(Supplier<I> instanceSupplier) {
         super(instanceSupplier);
     }

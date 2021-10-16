@@ -56,7 +56,6 @@ public class Playground {
                         )
                 )
         );
-
         dummyClassInterface.testArgumentRewire(true, 1);
         dummyClassInterface.testArgumentRewire( 1, true);
     }

@@ -13,8 +13,8 @@ import java.util.Objects;
  * @param <T> proxy type
  */
 public class InterceptableInvocationHandlerBuilder<T>
-        extends GenericBuilder<InterceptableInvocationHandler<T>>
-        implements Builder<InterceptableInvocationHandler<T>>, InterceptableInvocationHandlerBuildContract<T, InterceptableInvocationHandlerBuilder<T>> {
+        extends GenericBuilder<InvocationHandler<T>, InterceptableInvocationHandler<T>>
+        implements InterceptableInvocationHandlerBuildContract<T, InterceptableInvocationHandlerBuilder<T>> {
 
     public InterceptableInvocationHandlerBuilder() {
         super(InterceptableInvocationHandler::new);
