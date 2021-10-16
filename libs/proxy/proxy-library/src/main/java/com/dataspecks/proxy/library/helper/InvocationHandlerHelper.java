@@ -2,11 +2,8 @@ package com.dataspecks.proxy.library.helper;
 
 import com.dataspecks.builder.Builder;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
-import com.dataspecks.proxy.core.handler.RedirectInvocationHandler;
 import com.dataspecks.proxy.core.handler.RedirectInvocationHandlerBuilder;
-import com.dataspecks.proxy.core.handler.dynamic.DynamicInvocationHandler;
 import com.dataspecks.proxy.core.handler.dynamic.DynamicInvocationHandlerBuilder;
-import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandler;
 import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandlerBuilder;
 
 import java.util.function.Supplier;
@@ -27,7 +24,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public <U> RedirectInvocationHandlerBuilder<T, U> Redirect(U target) {
-        return RedirectInvocationHandler.builder(target);
+        return RedirectInvocationHandlerBuilder.create(target);
     }
 
     /*******************************************************************************************************************
@@ -35,7 +32,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public DynamicInvocationHandlerBuilder<T> Dynamic() {
-        return DynamicInvocationHandler.builder();
+        return DynamicInvocationHandlerBuilder.create();
     }
 
 
@@ -44,12 +41,7 @@ public class InvocationHandlerHelper<T> {
      ******************************************************************************************************************/
 
     public InterceptableInvocationHandlerBuilder<T> Interceptable() {
-        return InterceptableInvocationHandler.builder();
-    }
-
-    public InterceptableInvocationHandlerBuilder<T> Interceptable(final Builder<? extends InvocationHandler<T>> iHBuilder) {
-        return InterceptableInvocationHandler.<T>builder()
-                .setHandler(iHBuilder);
+        return InterceptableInvocationHandlerBuilder.create();
     }
 
     /*******************************************************************************************************************

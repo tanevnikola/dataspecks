@@ -2,29 +2,26 @@ package com.dataspecks.proxy.core.handler;
 
 import com.dataspecks.builder.Builder;
 
-import java.lang.reflect.Method;
-
 /**
- * Builder contract
+ * Builder
  *
  * @param <T> instance to be built
  * @param <U> type of the target instance to redirect to
  */
-public interface RedirectInvocationHandlerBuilder<T, U> extends Builder<RedirectInvocationHandler<T, U>> {
-    /**
-     * Lookup a {@link Method} by its signature from the target instance and set it as target method.
-     *
-     * @param name method name
-     * @param args method argument types
-     * @return {@link RedirectInvocationHandler.BuilderImpl}
-     */
-    RedirectInvocationHandlerBuilder<T, U> setMethod(String name, Class<?>... args);
+public interface RedirectInvocationHandlerBuilder<T, U> extends
+        Builder<RedirectInvocationHandler<T, U>>,
+        RedirectInvocationHandlerBuildContract<T, RedirectInvocationHandlerBuilder<T, U>> {
 
     /**
-     * Set a {@link Method} as the target method
+     * Create a builder instance
      *
-     * @param method {@link Method} instance
-     * @return {@link RedirectInvocationHandler.BuilderImpl}
+     * @param targetI the target instance
+     * @param <T> proxy type
+     * @param <U> target instanc
+     *           e type
+     * @return {@link RedirectInvocationHandler.BuilderImpl} instance
      */
-    RedirectInvocationHandlerBuilder<T, U> setMethod(Method method);
+    static <T, U> RedirectInvocationHandlerBuilder<T, U> create(U targetI) {
+        return new RedirectInvocationHandler.BuilderImpl<>(targetI);
+    }
 }

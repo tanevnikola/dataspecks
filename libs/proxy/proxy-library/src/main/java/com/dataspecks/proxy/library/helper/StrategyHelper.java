@@ -1,6 +1,5 @@
 package com.dataspecks.proxy.library.helper;
 
-import com.dataspecks.proxy.core.handler.dynamic.routing.FallbackRoutingStrategy;
 import com.dataspecks.proxy.core.handler.dynamic.routing.FallbackRoutingStrategyBuilder;
 
 public class StrategyHelper<T> {
@@ -15,7 +14,7 @@ public class StrategyHelper<T> {
     }
 
     public <U> FallbackRoutingStrategyBuilder<T, U> Fallback(U target) {
-        return FallbackRoutingStrategy.builder(type, target);
+        return FallbackRoutingStrategyBuilder.create(type, target);
     }
 
 }

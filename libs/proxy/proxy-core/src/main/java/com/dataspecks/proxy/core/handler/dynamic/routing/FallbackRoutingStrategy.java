@@ -6,7 +6,7 @@ import com.dataspecks.commons.exception.ReflectionException;
 import com.dataspecks.commons.reflection.Methods;
 import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.handler.InvocationHandler;
-import com.dataspecks.proxy.core.handler.RedirectInvocationHandler;
+import com.dataspecks.proxy.core.handler.RedirectInvocationHandlerBuilder;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -14,13 +14,12 @@ import java.util.Objects;
 /**
  * This is an implementation of {@link com.dataspecks.proxy.core.handler.dynamic.InvocationStrategy} and derived from
  * {@link AbstractRoutingStrategy} that will automatically redirect all calls from the proxy instance to the
- * appropriate (same signature) methods to the provided target instance. It uses a {@link RedirectInvocationHandler}
- * internally to perform the redirection.
+ * appropriate (same signature) methods to the provided target instance.
  *
  * @param <T> proxy type
  * @param <U> target instance type
  */
-public final class FallbackRoutingStrategy<T, U> extends AbstractRoutingStrategy<T, Method> {
+final class FallbackRoutingStrategy<T, U> extends AbstractRoutingStrategy<T, Method> {
     private U fallbackI = null;
 
     private FallbackRoutingStrategy() {}
@@ -42,30 +41,18 @@ public final class FallbackRoutingStrategy<T, U> extends AbstractRoutingStrategy
     }
 
     /**
-     * Returns a builder instance
-     * @param type proxy type
-     * @param targetI target instance type
-     * @param <T> proxy type
-     * @param <U> target instance type
-     * @return {@link BuilderImpl}
-     */
-    public static <T, U> FallbackRoutingStrategyBuilder<T, U> builder(Class<T> type, U targetI) {
-        return new BuilderImpl<>(type, targetI);
-    }
-
-    /**
      * Concrete builder
      *
      * @param <T> proxy type
      * @param <U> target instance type
      */
-    private static class BuilderImpl<T, U> extends AbstractBuilder<FallbackRoutingStrategy<T, U>, T, Method>
+    public static class BuilderImpl<T, U> extends AbstractBuilder<FallbackRoutingStrategy<T, U>, T, Method>
         implements FallbackRoutingStrategyBuilder<T, U>{
 
         private final Class<T> type;
         private Boolean strictMode = false;
 
-        private BuilderImpl(final Class<T> type, final U fallbackI) {
+        public BuilderImpl(final Class<T> type, final U fallbackI) {
             super(FallbackRoutingStrategy::new);
             this.type = type;
             configureMethods(type, fallbackI);
@@ -92,7 +79,7 @@ public final class FallbackRoutingStrategy<T, U> extends AbstractRoutingStrategy
 
         /**
          * Looks up for all the methods (by name and signature) from the proxy type into the fallback instance and
-         * create a {@link RedirectInvocationHandler} for each.
+         * create a RedirectInvocationHandler for each.
          *
          * @param type the proxy type
          * @param fallbackI fallback instance
@@ -106,7 +93,7 @@ public final class FallbackRoutingStrategy<T, U> extends AbstractRoutingStrategy
                             ? Methods.getMatching(fallbackI.getClass(), method)
                             : Methods.findMatching(fallbackI.getClass(), method);
                     if (foundMethod != null) {
-                        fRStrategy.iHandlerMap.put(method, RedirectInvocationHandler.<T, U>builder(fallbackI)
+                        fRStrategy.iHandlerMap.put(method, RedirectInvocationHandlerBuilder.<T, U>create(fallbackI)
                                 .setMethod(foundMethod)
                                 .build());
                     }

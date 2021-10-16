@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @param <U> target instance type
  */
-public final class RedirectInvocationHandler<T, U> implements InvocationHandler<T> {
+final class RedirectInvocationHandler<T, U> implements InvocationHandler<T> {
     private U targetI = null;
     private Method targetM = null;
 
@@ -33,27 +33,14 @@ public final class RedirectInvocationHandler<T, U> implements InvocationHandler<
     }
 
     /**
-     * Create a builder instance
-     *
-     * @param targetI the target instance
-     * @param <T> proxy type
-     * @param <U> target instanc
-     *           e type
-     * @return {@link BuilderImpl} instance
-     */
-    public static <T, U> RedirectInvocationHandlerBuilder<T, U> builder(U targetI) {
-        return new BuilderImpl<>(targetI);
-    }
-
-    /**
      * Concrete builder
      * @param <T> proxy type
      * @param <U> instance type
      */
-    private static class BuilderImpl<T, U> extends GenericBuilder<RedirectInvocationHandler<T, U>>
+    public static class BuilderImpl<T, U> extends GenericBuilder<RedirectInvocationHandler<T, U>>
             implements RedirectInvocationHandlerBuilder<T, U> {
 
-        private BuilderImpl(U targetI) {
+        public BuilderImpl(U targetI) {
             super(RedirectInvocationHandler::new);
             configure(rIHandler -> rIHandler.targetI = targetI);
         }

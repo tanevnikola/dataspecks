@@ -1,36 +1,25 @@
 package com.dataspecks.proxy.core.handler.dynamic.routing;
 
-import com.dataspecks.builder.Builder;
-import com.dataspecks.commons.exception.ReflectionException;
-import com.dataspecks.proxy.core.builder.BuildOptions;
-import com.dataspecks.proxy.core.handler.InvocationHandler;
-
 import java.lang.reflect.Method;
 
 /**
- *
+ * Builder
  * @param <T> proxy type
  * @param <U> fallback instance type
  */
-public interface FallbackRoutingStrategyBuilder<T, U> extends RoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method> {
+public interface FallbackRoutingStrategyBuilder<T, U> extends
+        RoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method>,
+        FallbackRoutingStrategyBuildContract<T, FallbackRoutingStrategyBuilder<T, U>> {
 
     /**
-     * The strict mode is a simple parameter that dictates the behaviour when building the the router. If the
-     * strictMode is true, means that the target instance must contain all the methods from the proxy interface
-     * otherwise will throw an exception during configuration.
-     * @param strictMode true/false
-     * @return {@link FallbackRoutingStrategyBuilder} to chain build options.
+     * Returns a builder instance
+     * @param type proxy type
+     * @param targetI target instance type
+     * @param <T> proxy type
+     * @param <U> target instance type
+     * @return {@link FallbackRoutingStrategy.BuilderImpl}
      */
-    FallbackRoutingStrategyBuilder<T, U> setStrictMode(boolean strictMode);
-
-    /**
-     * Register a {@link InvocationHandler} builder from the target instance described by
-     * its signature (name/args).
-     * @param name method name
-     * @param args method argument types
-     * @return {@link BuildOptions.Set} that expects an invocation handler builder and returns the {@link FallbackRoutingStrategyBuilder}
-     *
-     * @throws ReflectionException in case the method cannot be found
-     */
-    BuildOptions.Set<FallbackRoutingStrategyBuilder<T, U>, Builder<? extends InvocationHandler<T>>> forMethod(String name, Class<?>... args) throws ReflectionException;
+    static <T, U> FallbackRoutingStrategyBuilder<T, U> create(Class<T> type, U targetI) {
+        return new FallbackRoutingStrategy.BuilderImpl<>(type, targetI);
+    }
 }

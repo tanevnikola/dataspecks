@@ -14,7 +14,7 @@ import java.util.Map;
  * A specialized {@link ArgumentsInterceptor} that uses argument indexes to find the {@link RewireOperation} for that
  * argument.
  */
-public final class RewireInterceptor implements ArgumentsInterceptor  {
+final class RewireInterceptor implements ArgumentsInterceptor  {
     private final Map<Integer, RewireOperation> rewireMap = new HashMap<>();
 
     private RewireInterceptor() {}
@@ -28,17 +28,13 @@ public final class RewireInterceptor implements ArgumentsInterceptor  {
         return result.toArray();
     }
 
-    public static RewireInterceptorBuilder builder() {
-        return new BuilderImpl();
-    }
-
     /**
      * Concrete builder
      */
-    private static final class BuilderImpl extends GenericBuilder<RewireInterceptor>
+    public static final class BuilderImpl extends GenericBuilder<RewireInterceptor>
             implements RewireInterceptorBuilder {
 
-        private BuilderImpl() {
+        public BuilderImpl() {
             super(RewireInterceptor::new);
         }
 

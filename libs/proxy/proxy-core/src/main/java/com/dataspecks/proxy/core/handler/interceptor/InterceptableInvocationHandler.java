@@ -20,7 +20,7 @@ import java.util.Optional;
  *
  * @param <T> proxy type
  */
-public final class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
+final class InterceptableInvocationHandler<T> implements InvocationHandler<T> {
     private InvocationHandler<T> iHandler = InvocationHandler.DeadEnd();
     private ArgumentsInterceptor aInterceptor = null;
     private ResultInterceptor<Object> rInterceptor = null;
@@ -50,23 +50,13 @@ public final class InterceptableInvocationHandler<T> implements InvocationHandle
     }
 
     /**
-     * Create builder instance of {@link BuilderImpl}
-     *
-     * @param <T> proxy type
-     * @return the builder instance
-     */
-    public static <T> InterceptableInvocationHandlerBuilder<T> builder() {
-        return new BuilderImpl<>();
-    }
-
-    /**
      * Concrete builder
      * @param <T> proxy type
      */
-    private static class BuilderImpl<T> extends GenericBuilder<InterceptableInvocationHandler<T>>
+    public static class BuilderImpl<T> extends GenericBuilder<InterceptableInvocationHandler<T>>
             implements InterceptableInvocationHandlerBuilder<T>{
 
-        private BuilderImpl() {
+        public BuilderImpl() {
             super(InterceptableInvocationHandler::new);
         }
 

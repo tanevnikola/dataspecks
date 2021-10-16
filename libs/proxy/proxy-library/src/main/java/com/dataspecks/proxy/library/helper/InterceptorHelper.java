@@ -1,6 +1,5 @@
 package com.dataspecks.proxy.library.helper;
 
-import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandler;
 import com.dataspecks.proxy.core.handler.interceptor.InterceptableInvocationHandlerBuilder;
 
 public class InterceptorHelper<T> {
@@ -15,6 +14,6 @@ public class InterceptorHelper<T> {
     }
 
     public InterceptableInvocationHandlerBuilder<T> Interceptable() {
-        return InterceptableInvocationHandler.<T>builder();
+        return InterceptableInvocationHandlerBuilder.<T>create();
     }
 }

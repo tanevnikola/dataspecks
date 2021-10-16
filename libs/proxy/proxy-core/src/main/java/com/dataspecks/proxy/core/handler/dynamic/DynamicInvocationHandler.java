@@ -15,7 +15,7 @@ import java.util.Optional;
  *
  * @param <T> proxy type
  */
-public final class DynamicInvocationHandler<T> implements InvocationHandler<T> {
+final class DynamicInvocationHandler<T> implements InvocationHandler<T> {
     private InvocationStrategy<T> iStrategy = InvocationStrategy.DeadEnd();
 
     /**
@@ -40,20 +40,11 @@ public final class DynamicInvocationHandler<T> implements InvocationHandler<T> {
     /**
      * Concrete builder
      * @param <T> proxy type
-     * @return the builder instance
      */
-    public static <T> DynamicInvocationHandlerBuilder<T> builder() {
-        return new BuilderImpl<>();
-    }
-
-    /**
-     * Concrete builder
-     * @param <T> proxy type
-     */
-    private static class BuilderImpl<T> extends GenericBuilder<DynamicInvocationHandler<T>>
+    public static final class BuilderImpl<T> extends GenericBuilder<DynamicInvocationHandler<T>>
             implements DynamicInvocationHandlerBuilder<T> {
 
-        protected BuilderImpl() {
+        public BuilderImpl() {
             super(DynamicInvocationHandler::new);
         }
 
