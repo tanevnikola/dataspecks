@@ -1,10 +1,9 @@
 package com.dataspecks.proxy.core;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.builder.Configurator;
-import com.dataspecks.builder.exception.runtime.BuilderException;
 import com.dataspecks.commons.exception.DException;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
@@ -14,8 +13,7 @@ import java.util.Objects;
  */
 public class ProxyBuilder<T> implements Builder<T> {
     private final Class<T> type;
-    private final Configurator<Void> configurator = new Configurator<>();
-    private java.lang.reflect.InvocationHandler iHandler;
+    private InvocationHandler iHandler;
 
     /**
      * Constructs a {@link ProxyBuilder} for a specific interface
@@ -32,15 +30,12 @@ public class ProxyBuilder<T> implements Builder<T> {
     /**
      * Configure the instance with a {@link java.lang.reflect.InvocationHandler}
      *
-     * @param iHBuilder A builder that produces {@link java.lang.reflect.InvocationHandler} instance
+     * @param iHandlerBuilder
      * @return {@link ProxyBuilder}
      */
-    public ProxyBuilder<T> setHandler(Builder<? extends java.lang.reflect.InvocationHandler> iHBuilder) {
-        DException.argue(Objects.nonNull(iHBuilder));
-        configurator.add(unused -> {
-            this.iHandler = iHBuilder.build();
-            DException.argue(Objects.nonNull(this.iHandler));
-        });
+    public ProxyBuilder<T> setHandler(Builder<? extends InvocationHandler> iHandlerBuilder) {
+        DException.argue(Objects.nonNull(iHandlerBuilder), "No InvocationHandler builder provided");
+        this.iHandler = iHandlerBuilder.build();
         return this;
     }
 
@@ -50,9 +45,6 @@ public class ProxyBuilder<T> implements Builder<T> {
      * @return proxy of type T
      */
     public T build() {
-        DException.runOrTrow(t -> new BuilderException(
-                String.format("Failed to create proxy: %s", t.getMessage()), t.getCause()),
-                () -> configurator.configure(null));
         DException.argue(Objects.nonNull(iHandler), "No InvocationHandler provided");
         return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class[] {type}, iHandler));
     }

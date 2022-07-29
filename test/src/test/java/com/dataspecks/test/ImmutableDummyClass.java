@@ -1,7 +1,5 @@
 package com.dataspecks.test;
 
-import com.dataspecks.builder.GenericBuilder;
-
 import java.util.Objects;
 
 public class ImmutableDummyClass {
@@ -9,7 +7,7 @@ public class ImmutableDummyClass {
     private int b = 4;
     private int c = 0;
 
-    private ImmutableDummyClass() {}
+    public ImmutableDummyClass() {}
 
     public Integer getA() {
         return a;
@@ -51,24 +49,4 @@ public class ImmutableDummyClass {
         return Objects.toString(c);
     }
 
-    public static class Builder extends GenericBuilder<ImmutableDummyClass, ImmutableDummyClass> {
-        Builder() {
-            super(ImmutableDummyClass::new);
-        }
-
-        public Builder setA(int a) {
-            configure(instance -> instance.a = a);
-            return this;
-        }
-
-        public Builder setB(int b) {
-            configure(instance -> instance.b = b);
-            return this;
-        }
-
-        public Builder setC(int c) {
-            configure(instance -> instance.c = c);
-            return this;
-        }
-    }
 }

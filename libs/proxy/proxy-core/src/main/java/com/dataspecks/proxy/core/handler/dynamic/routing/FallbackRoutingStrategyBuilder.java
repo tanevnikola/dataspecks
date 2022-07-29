@@ -3,12 +3,13 @@ package com.dataspecks.proxy.core.handler.dynamic.routing;
 import com.dataspecks.builder.Builder;
 import com.dataspecks.commons.exception.DException;
 import com.dataspecks.commons.exception.ReflectionException;
+import com.dataspecks.commons.exception.unchecked.UncheckedException;
 import com.dataspecks.commons.reflection.Methods;
 import com.dataspecks.proxy.core.builder.BuildOptions;
-import com.dataspecks.proxy.core.builder.contract.handler.dynamic.routing.FallbackRoutingStrategyBuildContract;
-import com.dataspecks.proxy.core.handler.InvocationHandler;
 import com.dataspecks.proxy.core.handler.RedirectInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.dynamic.InvocationStrategy;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -18,30 +19,28 @@ import java.util.Objects;
  * @param <T> proxy type
  * @param <U> target instance type
  */
-public class FallbackRoutingStrategyBuilder<T, U>
-        extends AbstractRoutingStrategyBuilder<FallbackRoutingStrategy<T, U>, T, Method>
-        implements FallbackRoutingStrategyBuildContract<T, FallbackRoutingStrategyBuilder<T, U>> {
-
+public class FallbackRoutingStrategyBuilder<T, U> extends AbstractRoutingStrategyBuilder<Method> {
     private final Class<T> type;
-    private Boolean strictMode = false;
+    private final U fallbackI;
+    private Boolean strictMode = true;
 
     public FallbackRoutingStrategyBuilder(final Class<T> type, final U fallbackI) {
-        super(FallbackRoutingStrategy::new);
+        super(new FallbackRoutingStrategy());
         this.type = type;
-        configureMethods(type, fallbackI);
+        this.fallbackI = fallbackI;
     }
 
-    @Override
     public FallbackRoutingStrategyBuilder<T, U> setStrictMode(boolean strictMode) {
         this.strictMode = strictMode;
         return this;
     }
 
-    @Override
-    public BuildOptions.Set<FallbackRoutingStrategyBuilder<T, U>, Builder<? extends InvocationHandler<T>>> forMethod(String name, Class<?>... args) throws ReflectionException {
+    public BuildOptions.Set<FallbackRoutingStrategyBuilder<T, U>, Builder<? extends InvocationHandler>> forMethod(
+            String name, Class<?>... args) throws ReflectionException {
+
         Method method = Methods.lookup(type, name, args);
         return iHBuilder -> {
-            configure(fRStrategy -> fRStrategy.iHandlerMap.put(method, iHBuilder.build()));
+            instanceTemplate.iHandlerMap.put(method, iHBuilder.build());
             return this;
         };
     }
@@ -55,29 +54,43 @@ public class FallbackRoutingStrategyBuilder<T, U>
      */
     private void configureMethods(Class<T> type, U fallbackI) {
         DException.argue(Objects.nonNull(fallbackI));
-        configure(fRStrategy -> {
-            fRStrategy.setFallbackI(fallbackI);
-            for (Method method : type.getMethods()) {
-                Method foundMethod = strictMode
+        for (Method method : type.getMethods()) {
+            if (instanceTemplate.iHandlerMap.get(method) != null) {
+                continue;
+            }
+
+            Method foundMethod = null;
+            try {
+                foundMethod = strictMode
                         ? Methods.getMatching(fallbackI.getClass(), method)
                         : Methods.findMatching(fallbackI.getClass(), method);
-                if (foundMethod != null) {
-                    fRStrategy.iHandlerMap.put(method, new RedirectInvocationHandlerBuilder<T, U>(fallbackI)
-                            .setMethod(foundMethod)
-                            .build());
-                }
+            } catch (ReflectionException e) {
+                throw new UncheckedException(e);
             }
-        });
+            if (foundMethod != null) {
+                instanceTemplate.iHandlerMap.put(method, new RedirectInvocationHandlerBuilder<>(fallbackI)
+                        .setMethod(foundMethod)
+                        .build());
+            }
+        }
     }
 
-    /**
-     * Perform instance validation
-     * @param fIRHandler {@link FallbackRoutingStrategy}
-     * @return {@link FallbackRoutingStrategy}
-     */
     @Override
-    protected FallbackRoutingStrategy<T, U> validate(FallbackRoutingStrategy<T, U> fIRHandler) {
-        DException.argue(Objects.nonNull(fIRHandler.getFallbackI()), "Target instance cannot be null");
-        return super.validate(fIRHandler);
+    public InvocationStrategy build() {
+        configureMethods(type, fallbackI);
+        return new FallbackRoutingStrategy(instanceTemplate);
+    }
+
+    private static final class FallbackRoutingStrategy extends AbstractRoutingStrategy<Method> {
+        FallbackRoutingStrategy() {}
+
+        FallbackRoutingStrategy(AbstractRoutingStrategy<Method> instance) {
+            super(instance);
+        }
+
+        @Override
+        public Method getRouteKey(Object proxy, Method method, Object... args) {
+            return method;
+        }
     }
 }

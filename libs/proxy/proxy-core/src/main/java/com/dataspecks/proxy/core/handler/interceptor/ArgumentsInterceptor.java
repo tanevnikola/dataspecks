@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  */
 public interface ArgumentsInterceptor {
     /**
-     * The intercept contract. Will be called by the {@link InterceptableInvocationHandler} before the invocation
+     * The intercept contract. Will be called by the {@link InterceptableInvocationHandlerBuilder} before the invocation
      * of its {@link java.lang.reflect.InvocationHandler}. The returned arguments will be used for the actual
      * invocation instead of the original arguments.
      *
@@ -18,9 +18,4 @@ public interface ArgumentsInterceptor {
      * @throws Throwable ex
      */
     Object[] intercept(Object proxy, Method method, Object... args) throws Throwable;
-
-    /**
-     * A pass-through arguments interceptor (without modification of the original arguments)
-     */
-    ArgumentsInterceptor PassThrough = (proxy, method, args) -> args;
 }

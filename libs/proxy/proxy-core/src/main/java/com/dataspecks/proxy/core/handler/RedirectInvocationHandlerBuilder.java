@@ -1,9 +1,9 @@
 package com.dataspecks.proxy.core.handler;
 
-import com.dataspecks.builder.GenericBuilder;
+import com.dataspecks.builder.Builder;
 import com.dataspecks.commons.exception.DException;
+import com.dataspecks.commons.exception.ReflectionException;
 import com.dataspecks.commons.reflection.Methods;
-import com.dataspecks.proxy.core.builder.contract.handler.RedirectInvocationHandlerBuildContract;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -11,41 +11,68 @@ import java.util.Objects;
 /**
  * Build an {@link InvocationHandler} that redirects the method invocation to a target method on a target instance.
  *
- * @param <T> proxy type
  * @param <U> target instance type
  */
-public class RedirectInvocationHandlerBuilder<T, U>
-        extends GenericBuilder<InvocationHandler<T>, RedirectInvocationHandler<T, U>>
-        implements RedirectInvocationHandlerBuildContract<T, RedirectInvocationHandlerBuilder<T, U>> {
+public class RedirectInvocationHandlerBuilder<U> implements Builder<java.lang.reflect.InvocationHandler> {
+
+    private final RedirectInvocationHandler<U> buildingInstance = new RedirectInvocationHandler<>();
 
     public RedirectInvocationHandlerBuilder(U targetI) {
-        super(RedirectInvocationHandler::new);
-        configure(rIHandler -> rIHandler.setTargetI(targetI));
+        DException.argue(Objects.nonNull(buildingInstance.targetInstance = targetI),
+                "Target instance cannot be null");
     }
 
-    public RedirectInvocationHandlerBuilder<T, U> setMethod(String name, Class<?>... args) {
-        configure(rIHandler -> rIHandler.setTargetM(Methods.lookup(rIHandler.getTargetI().getClass(), name, args)));
-        return this;
+    public RedirectInvocationHandlerBuilder<U> setMethod(String name, Class<?>... args) throws ReflectionException {
+        Method method = Methods.lookup(buildingInstance.targetInstance.getClass(), name, args);
+        return setMethod(method);
     }
 
-    public RedirectInvocationHandlerBuilder<T, U> setMethod(Method method) {
-        configure(rIHandler -> rIHandler.setTargetM(method));
+    public RedirectInvocationHandlerBuilder<U> setMethod(Method method) {
+        DException.argue(method.getDeclaringClass().equals(buildingInstance.targetInstance.getClass()),
+                "Provided method has declaring class that is different than the target's instance class");
+        buildingInstance.targetMethod = method;
         return this;
     }
 
     /**
      * Perform instance validation. Both target instance and target method must no be null. Additionally the target
-     * method's declaring class my be the target instance class.
+     * method's declaring class must be the target instance class.
      *
-     * @param rIHandler {@link RedirectInvocationHandler}
-     * @return {@link RedirectInvocationHandler}
+     * @return {@link InvocationHandler}
      */
     @Override
-    protected RedirectInvocationHandler<T, U> validate(RedirectInvocationHandler<T, U> rIHandler) {
-        DException.argue(Objects.nonNull(rIHandler.getTargetI()), "Target instance cannot be null");
-        DException.argue(Objects.nonNull(rIHandler.getTargetM()), "Target method cannot be null");
-        DException.argue(rIHandler.getTargetM().getDeclaringClass().equals(rIHandler.getTargetI().getClass()),
-                "Target target method's declaring class is different than the target's instance class");
-        return super.validate(rIHandler);
+    public java.lang.reflect.InvocationHandler build() {
+        DException.argue(Objects.nonNull(buildingInstance.targetMethod), "Target method cannot be null");
+        return new RedirectInvocationHandler<>(buildingInstance);
+    }
+
+    /**
+     *
+     * @param <U>
+     */
+    private static final class RedirectInvocationHandler<U> implements java.lang.reflect.InvocationHandler {
+        private U targetInstance = null;
+        private Method targetMethod = null;
+
+        RedirectInvocationHandler() {}
+
+        RedirectInvocationHandler(RedirectInvocationHandler<U> obj) {
+            this.targetInstance = obj.targetInstance;
+            this.targetMethod = obj.targetMethod;
+        }
+
+        /**
+         * Invokes the target method from the target instance with the provided arguments
+         *
+         * @param proxy the proxy instance that the method was invoked o
+         * @param method a {@link Method} instance corresponding to the interface method invoked on the proxy instance.
+         * @param args the arguments passed when the method was invoked
+         * @return result of the invocation
+         * @throws Throwable ex
+         */
+        @Override
+        public Object invoke(Object proxy, Method method, Object... args) throws Throwable {
+            return Methods.invoke(targetMethod, targetInstance, args);
+        }
     }
 }

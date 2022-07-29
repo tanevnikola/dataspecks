@@ -1,11 +1,7 @@
 package com.dataspecks.proxy.core.builder;
 
-public interface BuildOptions {
-    interface Set<R, S> {
-        R set(S s);
-    }
+public final class BuildOptions {
+    private BuildOptions() {}
 
-    interface Pass<R, S> {
-        R pass(S s);
-    }
+    public interface Set<R, S> { R set(S s); }
 }
