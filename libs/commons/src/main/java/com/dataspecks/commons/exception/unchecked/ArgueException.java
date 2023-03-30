@@ -1,6 +1,6 @@
 package com.dataspecks.commons.exception.unchecked;
 
-public class ArgueException extends UncheckedException {
+public class ArgueException extends DsUncheckedException {
     public ArgueException() {
         super();
     }

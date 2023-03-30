@@ -7,8 +7,6 @@ public interface DummyClassInterface {
 
     Integer getC();
 
-    String getAstring();
-
     String getBstring();
 
     String getCstring();

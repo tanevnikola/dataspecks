@@ -1,6 +1,8 @@
 package com.dataspecks.commons.exception;
 
-public class ReflectionException extends DException {
+import com.dataspecks.commons.exception.checked.DsCheckedException;
+
+public class ReflectionException extends DsCheckedException {
     public ReflectionException() {
         super();
     }
