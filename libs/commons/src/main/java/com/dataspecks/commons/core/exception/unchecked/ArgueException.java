@@ -1,4 +1,6 @@
-package com.dataspecks.commons.exception.unchecked;
+package com.dataspecks.commons.core.exception.unchecked;
+
+import java.util.Optional;
 
 public class ArgueException extends DsUncheckedException {
     public ArgueException() {
@@ -21,4 +23,5 @@ public class ArgueException extends DsUncheckedException {
                                   boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+
 }

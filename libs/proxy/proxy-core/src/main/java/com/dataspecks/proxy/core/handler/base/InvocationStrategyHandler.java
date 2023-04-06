@@ -1,10 +1,14 @@
-package com.dataspecks.proxy.core.handler.base.strategy;
+package com.dataspecks.proxy.core.handler.base;
 
+import com.dataspecks.proxy.core.handler.base.strategy.InvocationStrategy;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 import com.dataspecks.proxy.utils.handler.InvocationHandlers;
 import com.dataspecks.proxy.utils.handler.base.strategy.InvocationStrategies;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.BitSet;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -12,7 +16,8 @@ import java.util.Optional;
  * an InvocationStrategy to determine the appropriate InvocationHandler for a
  * given method invocation.
  */
-final class StrategyBasedInvocationHandler implements InvocationHandler {
+public final class InvocationStrategyHandler implements InvocationHandler {
+
     /**
      * The InvocationStrategy instance used to determine the appropriate
      * InvocationHandler for a given method invocation.
@@ -53,7 +58,32 @@ final class StrategyBasedInvocationHandler implements InvocationHandler {
         InvocationHandler handler = Optional
                 .ofNullable(strategy.selectHandler(proxy, method, args))
                 .orElse(InvocationHandlers.DEAD_END);
-
         return handler.invoke(proxy, method, args);
+    }
+
+    public static class Builder {
+        private InvocationStrategyHandler instance;
+
+        /**
+         * Sets the InvocationStrategy for the StrategyBasedInvocationHandler being built.
+         *
+         * @param invocationStrategy the InvocationStrategy to be set
+         * @return the current StrategyBasedInvocationHandlerBuilder instance
+         */
+        public Builder setStrategy(InvocationStrategy invocationStrategy) {
+            instance.setStrategy(invocationStrategy);
+            DsExceptions.argue(Objects.nonNull(instance.getStrategy()));
+            return this;
+        }
+
+        /**
+         * Builds the StrategyBasedInvocationHandler instance with the configured InvocationStrategy.
+         *
+         * @return the built StrategyBasedInvocationHandler instance
+         */
+        public InvocationHandler build() {
+            DsExceptions.argue(Objects.nonNull(instance.getStrategy()), "No strategy set");
+            return instance;
+        }
     }
 }

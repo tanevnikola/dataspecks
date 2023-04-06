@@ -1,6 +1,6 @@
 package com.dataspecks.proxy.core.exception.unchecked;
 
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
+import com.dataspecks.commons.core.exception.unchecked.DsUncheckedException;
 
 public class DeadEndException extends DsUncheckedException {
     public DeadEndException() {

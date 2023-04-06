@@ -1,8 +1,8 @@
 package com.dataspecks.proxy.utils.handler.extended.adapter;
 
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
 import com.dataspecks.proxy.core.exception.unchecked.DeadEndException;
 import com.dataspecks.proxy.core.handler.extended.adapter.ValueAdapter;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +48,7 @@ public final class ValueAdapters {
      * A {@link ValueAdapter} that converts String to Integer.
      */
     public final static ValueAdapter<Object> StringToInteger = arg -> {
-        DsUncheckedException.argue(arg instanceof String,
+        DsExceptions.argue(arg instanceof String,
                 String.format("Expected type '%s', got '%s'", String.class, Optional.ofNullable(arg)
                         .map(o -> o.getClass().toString())
                         .orElse("null")));
@@ -82,7 +82,7 @@ public final class ValueAdapters {
      * the object is.
      */
     public final static ValueAdapter<Object> Deserialize = arg -> {
-        DsUncheckedException.argue(arg instanceof byte[]);
+        DsExceptions.argue(arg instanceof byte[]);
         ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream((byte[])arg));
         return in.readObject();
     };

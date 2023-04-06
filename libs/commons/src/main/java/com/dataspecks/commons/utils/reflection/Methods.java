@@ -1,12 +1,9 @@
 package com.dataspecks.commons.utils.reflection;
 
-import com.dataspecks.commons.exception.ReflectionException;
+import com.dataspecks.commons.core.exception.ReflectionException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.IntStream;
 
 public class Methods {
     public static Method lookup(Class<?> type, String name, Class<?>... args) throws ReflectionException {
@@ -17,9 +14,9 @@ public class Methods {
         }
     }
 
-    public static Object invoke(Method m, Object obj, Object... args) throws Throwable {
+    public static Object invoke(Object instance, Method method, Object... args) throws Throwable {
         try {
-            return m.invoke(obj, args);
+            return method.invoke(instance, args);
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }

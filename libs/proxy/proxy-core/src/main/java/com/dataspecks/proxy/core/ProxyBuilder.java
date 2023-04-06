@@ -1,7 +1,7 @@
 package com.dataspecks.proxy.core;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -20,15 +20,15 @@ public class ProxyBuilder<T> implements Builder<T> {
      * @param type the proxy type
      */
     public ProxyBuilder(final Class<T> type) {
-        DsUncheckedException.argue(Objects.nonNull(type), "Proxy type cannot be null");
-        DsUncheckedException.argue(type.isInterface(),
+        DsExceptions.argue(Objects.nonNull(type), "Proxy type cannot be null");
+        DsExceptions.argue(type.isInterface(),
                 String.format("'%s' can only be created for interfaces. '%s' is not an interface",
                         ProxyBuilder.class, type.getName()));
         this.type = type;
     }
 
     public T withHandler(InvocationHandler invocationHandler) {
-        DsUncheckedException.argue(Objects.nonNull(invocationHandler), "No InvocationHandler provided");
+        DsExceptions.argue(Objects.nonNull(invocationHandler), "No InvocationHandler provided");
         this.iHandler = invocationHandler;
         return build();
     }

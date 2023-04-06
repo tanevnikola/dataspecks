@@ -1,6 +1,6 @@
-package com.dataspecks.commons.exception;
+package com.dataspecks.commons.core.exception;
 
-import com.dataspecks.commons.exception.checked.DsCheckedException;
+import com.dataspecks.commons.core.exception.checked.DsCheckedException;
 
 public class ReflectionException extends DsCheckedException {
     public ReflectionException() {

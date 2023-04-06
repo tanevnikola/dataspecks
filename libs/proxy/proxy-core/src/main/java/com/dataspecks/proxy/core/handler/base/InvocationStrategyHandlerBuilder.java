@@ -1,7 +1,8 @@
-package com.dataspecks.proxy.core.handler.base.strategy;
+package com.dataspecks.proxy.core.handler.base;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
+import com.dataspecks.proxy.core.handler.base.strategy.InvocationStrategy;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Objects;
@@ -10,12 +11,12 @@ import java.util.Objects;
  * StrategyBasedInvocationHandlerBuilder is a builder for creating StrategyBasedInvocationHandler instances
  * with a specified InvocationStrategy.
  */
-public final class StrategyBasedInvocationHandlerBuilder implements Builder<InvocationHandler> {
+public final class InvocationStrategyHandlerBuilder implements Builder<InvocationHandler> {
 
     /**
      * The StrategyBasedInvocationHandler instance being built.
      */
-    private final StrategyBasedInvocationHandler handlerInstance = new StrategyBasedInvocationHandler();
+    private final InvocationStrategyHandler handlerInstance = new InvocationStrategyHandler();
 
     /**
      * Sets the InvocationStrategy for the StrategyBasedInvocationHandler being built.
@@ -25,7 +26,7 @@ public final class StrategyBasedInvocationHandlerBuilder implements Builder<Invo
      */
     public InvocationHandler fromStrategy(InvocationStrategy invocationStrategy) {
         handlerInstance.setStrategy(invocationStrategy);
-        DsUncheckedException.argue(Objects.nonNull(handlerInstance.getStrategy()));
+        DsExceptions.argue(Objects.nonNull(handlerInstance.getStrategy()));
         return build();
     }
 
@@ -36,7 +37,7 @@ public final class StrategyBasedInvocationHandlerBuilder implements Builder<Invo
      */
     @Override
     public InvocationHandler build() {
-        DsUncheckedException.argue(Objects.nonNull(handlerInstance.getStrategy()), "No strategy set");
+        DsExceptions.argue(Objects.nonNull(handlerInstance.getStrategy()), "No strategy set");
         return handlerInstance;
     }
 }

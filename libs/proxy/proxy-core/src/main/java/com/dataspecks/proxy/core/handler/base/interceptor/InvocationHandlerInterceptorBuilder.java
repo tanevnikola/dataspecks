@@ -1,7 +1,7 @@
 package com.dataspecks.proxy.core.handler.base.interceptor;
 
 import com.dataspecks.builder.Builder;
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Objects;
@@ -13,19 +13,19 @@ public class InvocationHandlerInterceptorBuilder implements Builder<InvocationHa
     private final InvocationHandlerInterceptor instance = new InvocationHandlerInterceptor();
 
     public InvocationHandlerInterceptorBuilder setHandler(InvocationHandler invocationHandler) {
-        DsUncheckedException.argue(Objects.nonNull(invocationHandler));
+        DsExceptions.argue(Objects.nonNull(invocationHandler));
         instance.setInvocationHandler(invocationHandler);
         return this;
     }
 
     public InvocationHandlerInterceptorBuilder setArgumentsInterceptor(ArgumentsInterceptor argumentsInterceptor) {
-        DsUncheckedException.argue(Objects.nonNull(argumentsInterceptor));
+        DsExceptions.argue(Objects.nonNull(argumentsInterceptor));
         instance.setArgumentsInterceptor(argumentsInterceptor);
         return this;
     }
 
     public InvocationHandlerInterceptorBuilder setResultInterceptor(final ResultInterceptor resultInterceptor) {
-        DsUncheckedException.argue(Objects.nonNull(resultInterceptor));
+        DsExceptions.argue(Objects.nonNull(resultInterceptor));
         instance.setResultInterceptor(resultInterceptor);
         return this;
     }

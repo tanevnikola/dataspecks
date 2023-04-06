@@ -1,9 +1,9 @@
 package com.dataspecks.proxy.utils.handler.extended.adapter;
 
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
 import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.handler.extended.adapter.RewireOperation;
 import com.dataspecks.proxy.core.handler.extended.adapter.ValueAdapter;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -18,9 +18,9 @@ public final class RewireOperations {
      * @return {@link BuildOptions.Set}
      */
     static BuildOptions.Set<RewireOperation, ValueAdapter<Object>> withArgument(int index) {
-        DsUncheckedException.argue(index >= 0);
+        DsExceptions.argue(index >= 0);
         return valueAdapter -> args -> {
-            DsUncheckedException.argue(index < args.length);
+            DsExceptions.argue(index < args.length);
             return valueAdapter.adapt(args[index]);
         };
     }
@@ -34,14 +34,14 @@ public final class RewireOperations {
      * @return {@link BuildOptions.Set}
      */
     static BuildOptions.Set<RewireOperation, ValueAdapter<Object[]>> withArguments(int... indices) {
-        DsUncheckedException.argue(Objects.nonNull(indices));
+        DsExceptions.argue(Objects.nonNull(indices));
         Arrays.stream(indices)
-                .forEach(value -> DsUncheckedException.argue(value >= 0));
+                .forEach(value -> DsExceptions.argue(value >= 0));
 
         return valueAdapter -> args -> {
-            DsUncheckedException.argue(Objects.nonNull(args));
+            DsExceptions.argue(Objects.nonNull(args));
             Arrays.stream(indices)
-                    .forEach(value -> DsUncheckedException.argue(value < args.length));
+                    .forEach(value -> DsExceptions.argue(value < args.length));
             Object[] argsToPass = Arrays.stream(indices)
                     .mapToObj(i -> args[i])
                     .toArray();

@@ -1,4 +1,4 @@
-package com.dataspecks.commons.exception.checked;
+package com.dataspecks.commons.core.exception.checked;
 
 public class DsCheckedException extends Exception {
     public DsCheckedException() {

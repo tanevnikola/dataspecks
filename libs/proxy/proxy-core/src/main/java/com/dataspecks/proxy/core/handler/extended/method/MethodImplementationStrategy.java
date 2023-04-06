@@ -16,8 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @see KeyBasedRoutingStrategy
  */
-public class MethodBasedRoutingStrategy implements KeyBasedRoutingStrategy<Method> {
-    protected final Map<Method, InvocationHandler> handlerMap = new ConcurrentHashMap<>();
+public class MethodImplementationStrategy implements KeyBasedRoutingStrategy<Method> {
+    protected final Map<Method, InvocationHandler> methodHandlers = new ConcurrentHashMap<>();
 
     /**
      * Registers an invocation handler for a given method. If a handler is already registered
@@ -31,11 +31,11 @@ public class MethodBasedRoutingStrategy implements KeyBasedRoutingStrategy<Metho
     public void registerHandler(Method key, InvocationHandler handler) throws ProxyConfigurationException {
         Objects.requireNonNull(key);
         Objects.requireNonNull(handler);
-        if (handlerMap.containsKey(key)) {
+        if (methodHandlers.containsKey(key)) {
             throw new ProxyConfigurationException(
                     String.format("Attempted to register a duplicate handler for key '%s'.", key.toString()));
         }
-        handlerMap.put(key, handler);
+        methodHandlers.put(key, handler);
     }
 
     /**
@@ -46,7 +46,7 @@ public class MethodBasedRoutingStrategy implements KeyBasedRoutingStrategy<Metho
      */
     @Override
     public InvocationHandler getHandler(Method key) {
-        return handlerMap.get(key);
+        return methodHandlers.get(key);
     }
 
     /**

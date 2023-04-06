@@ -1,15 +1,15 @@
 package com.dataspecks.proxy.core.handler.extended.method;
 
-import com.dataspecks.commons.exception.ReflectionException;
-import com.dataspecks.commons.exception.unchecked.DsUncheckedException;
+import com.dataspecks.commons.core.exception.ReflectionException;
 import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.core.builder.BuildOptions;
 import com.dataspecks.proxy.core.exception.unchecked.ProxyConfigurationException;
-import com.dataspecks.proxy.core.handler.base.simple.RedirectInvocationHandlerBuilder;
+import com.dataspecks.proxy.core.handler.base.InterceptableInvocationHandler;
+import com.dataspecks.proxy.core.handler.base.RedirectInvocationHandlerBuilder;
 import com.dataspecks.proxy.core.handler.base.strategy.InvocationStrategy;
 import com.dataspecks.proxy.core.handler.base.strategy.key.KeyBasedRoutingStrategyBuilder;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +35,7 @@ public class MethodImplementationStrategyBuilder<T> extends KeyBasedRoutingStrat
      * @param interfaceType   the interface type to create a dynamic proxy for
      */
     public MethodImplementationStrategyBuilder(final Class<T> interfaceType) {
-        super(new MethodBasedRoutingStrategy());
+        super(new MethodImplementationStrategy());
         this.interfaceType = interfaceType;
     }
 
@@ -75,7 +75,7 @@ public class MethodImplementationStrategyBuilder<T> extends KeyBasedRoutingStrat
      * @return a {@code BuildOptions.Set} for configuring the {@code InvocationHandler} for the method
      * @throws ReflectionException if the method cannot be found
      */
-    public BuildOptions.Set<MethodImplementationStrategyBuilder<T>, InvocationHandler> forMethod(
+    public BuildOptions.Set<MethodImplementationStrategyBuilder<T>, InterceptableInvocationHandler> forMethod(
             String methodName, Class<?>... args) throws ReflectionException {
         Method m = Methods.lookup(interfaceType, methodName, args);
         return invocationHandler ->
@@ -96,12 +96,14 @@ public class MethodImplementationStrategyBuilder<T> extends KeyBasedRoutingStrat
      * @param fallbackInstance the fallback instance to use
      */
     private void setupFallbackHandlers(Object fallbackInstance) {
-        DsUncheckedException.argue(Objects.nonNull(fallbackInstance));
+        DsExceptions.argue(Objects.nonNull(fallbackInstance));
 
         for (Method method : getMethodsWithoutHandlers(interfaceType)) {
             Optional.ofNullable(Methods.findMatching(fallbackInstance.getClass(), method))
-                    .map(new RedirectInvocationHandlerBuilder<>(fallbackInstance)::fromMethod)
-                    .ifPresent(invocationHandler -> getInstance().registerHandler(method, invocationHandler));
+                    .map(matchingMethod -> new RedirectInvocationHandlerBuilder<>()
+                            .forMethod(matchingMethod)
+                            .build())
+                    .ifPresent(matchingMethodHandler -> getInstance().registerHandler(method, matchingMethodHandler));
         }
     }
 
