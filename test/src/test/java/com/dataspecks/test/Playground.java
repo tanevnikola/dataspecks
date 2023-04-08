@@ -1,35 +1,95 @@
 package com.dataspecks.test;
 
 import com.dataspecks.commons.core.exception.ReflectionException;
+import com.dataspecks.commons.utils.reflection.Methods;
+import com.dataspecks.proxy.core.DynamicProxy;
 import com.dataspecks.proxy.core.ProxyBuilder;
-import com.dataspecks.proxy.core.handler.base.InvocationStrategyHandler;
-import com.dataspecks.proxy.core.handler.extended.method.MethodImplementationStrategyBuilder;
+import com.dataspecks.proxy.core.handler.base.InvocationInterceptor;
+import com.dataspecks.proxy.core.handler.base.ProxyInvocationHandler;
+import com.dataspecks.proxy.core.handler.base.DelegatingInvocationHandler;
+import com.dataspecks.proxy.core.handler.registry.DefaultInstanceRegistry;
+import com.dataspecks.proxy.core.handler.registry.DefaultInvocationHandlerRegistry;
+import com.dataspecks.proxy.utils.handler.base.InvocationHandlers;
 import org.junit.Test;
+
+import java.lang.reflect.InvocationHandler;
 
 
 public class Playground {
 
     @Test
-    public void newPlayground() throws ReflectionException {
-        DummyClassInterface dummy = new ProxyBuilder<>(DummyClassInterface.class).withHandler(
-                new InvocationStrategyHandler.Builder().setStrategy(
-                        new MethodImplementationStrategyBuilder<>(DummyClassInterface.class)
-                                .setStrictMode(true)
-                                .addFallbackInstance(new IncompleteDummyClass())
-                                .addFallbackInstance(this)
-                                .build())
-                        .build());
+    public void nominalTestCase() {
+        ProxyInvocationHandler proxyInvocationHandler = new ProxyInvocationHandler.Builder()
+                .build();
 
-        System.out.println(dummy.foo(1));
+        DummyInterface dummy = new ProxyBuilder<>(DummyInterface.class)
+                .withHandler(proxyInvocationHandler);
         System.out.println(dummy.getA());
+        System.out.println(dummy.foo(1));
     }
 
-    public String foo(Integer x) {
-        return "Hello world " + x;
+    @Test
+    public void incompleteHandlerInstance1() throws ReflectionException {
+
+        ProxyInvocationHandler proxyInvocationHandler = ProxyInvocationHandler.builder()
+                .setInvocationHandlerRegistry(DefaultInvocationHandlerRegistry.builder()
+                        .setFallbackRegistry(DefaultInstanceRegistry.fromInstances(
+                                new IncompleteDummyClassA(),
+                                new IncompleteDummyClassB()))
+                        .forMethod(Methods.lookup(DummyInterface.class, "getA")).intercept(ctx -> {
+                            String msg = String.format("Intercepted '%s'", ctx.method());
+                            System.out.println(msg);
+                            return ctx.proceed();
+                        })
+                        .forMethod(Methods.lookup(Object.class, "toString")).intercept(ctx -> {
+                            String msg = String.format("Intercepted '%s'", ctx.method());
+                            System.out.println(msg);
+                            return ctx.proceed();
+                        })
+                        .build())
+                .build();
+
+        DummyInterface dummy = new ProxyBuilder<>(DummyInterface.class).withHandler(proxyInvocationHandler);
+        System.out.println(dummy.getA());
+        System.out.println(dummy.getA());
+        System.out.println(dummy.foo(1));
+        System.out.println(dummy);
+        System.out.println(dummy.hashCode());
     }
 
-    public Integer getA() {
-        return 5;
+    @Test
+    public void testDelegate() {
+        InvocationHandler a = (proxy, method, args) -> null;
+        DelegatingInvocationHandler handler = DelegatingInvocationHandler.builder().build();
+        handler.initialize(a);
+        handler.initialize(a);
+    }
+
+
+    @Test
+    public void dynamicProxyBuilderTest() throws ReflectionException {
+        InvocationInterceptor interceptor = ctx -> {
+            Object res = ctx.proceed();
+            String msg = String.format("Value '%s', Intercepted '%s'",res, ctx.method());
+            System.out.println(msg);
+            return res instanceof Integer ? (Integer)res + 1 : res;
+        };
+        DummyInterface dummy = DynamicProxy.builder(DummyInterface.class)
+                .setFallbackInstances(
+                        new IncompleteDummyClassA(),
+                        new IncompleteDummyClassB())
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").set((proxy, method, args) -> 11111)
+
+                .forMethod("foo", Integer.class).intercept(interceptor)
+                .forMethod(Methods.lookup(Object.class, "toString")).intercept(interceptor)
+                .forMethod(Methods.lookup(Object.class, "hashCode")).intercept(interceptor)
+                .build();
+
+        dummy.getA();
+
     }
 
 }
