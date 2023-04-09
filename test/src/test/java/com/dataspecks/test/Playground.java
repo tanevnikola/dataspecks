@@ -1,63 +1,95 @@
 package com.dataspecks.test;
 
-import com.dataspecks.commons.exception.ReflectionException;
-import com.dataspecks.proxy.core.handler.interceptor.adapter.RewireArgumentsInterceptorBuilder;
-import com.dataspecks.proxy.core.handler.interceptor.adapter.RewireOperation;
-import com.dataspecks.proxy.core.handler.interceptor.adapter.ValueAdapter;
-import com.dataspecks.proxy.library.helper.Builders;
+import com.dataspecks.commons.core.exception.ReflectionException;
+import com.dataspecks.commons.utils.reflection.Methods;
+import com.dataspecks.proxy.core.DynamicProxy;
+import com.dataspecks.proxy.core.ProxyBuilder;
+import com.dataspecks.proxy.core.handler.base.InvocationInterceptor;
+import com.dataspecks.proxy.core.handler.base.ProxyInvocationHandler;
+import com.dataspecks.proxy.core.handler.base.DelegatingInvocationHandler;
+import com.dataspecks.proxy.core.handler.registry.DefaultInstanceRegistry;
+import com.dataspecks.proxy.core.handler.registry.DefaultInvocationHandlerRegistry;
+import com.dataspecks.proxy.utils.handler.base.InvocationHandlers;
 import org.junit.Test;
+
+import java.lang.reflect.InvocationHandler;
 
 
 public class Playground {
-    private static final String M_NAME_FOO = "foo";
-    private static final String M_NAME_GETA = "getA";
-    private static final String M_TEST_ARGUMENT_REWIRE = "testArgumentRewire";
-    private static final String M_NAME_GETB = "getB";
-    private static final String M_NAME_GETC = "getC";
-
-    ImmutableDummyClass dummyClass = new ImmutableDummyClass.Builder()
-            .setA(5)
-            .setB(7)
-            .setC(324)
-            .build();
 
     @Test
-    public void newPlayground() throws ReflectionException {
-        Builders<DummyClassInterface> builders = Builders.forType(DummyClassInterface.class);
+    public void nominalTestCase() {
+        ProxyInvocationHandler proxyInvocationHandler = new ProxyInvocationHandler.Builder()
+                .build();
 
-        DummyClassInterface dummyClassInterface = builders.Proxy(builders.InvocationHandler.Dynamic()
-                .setStrategy(builders.Strategy.Fallback(dummyClass)
-                        .forMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class, String.class).set(
-                                builders.InvocationHandler.Interceptable()
-                                        .setArgumentsInterceptor(new RewireArgumentsInterceptorBuilder()
-                                                .forArgument(0).set(RewireOperation.withArguments(0, 1, 2).set(ValueAdapter.Concatenate)))
-                                        .setHandler(builders.InvocationHandler.Redirect(dummyClass)
-                                                .setMethod(M_TEST_ARGUMENT_REWIRE, String.class)))
+        DummyInterface dummy = new ProxyBuilder<>(DummyInterface.class)
+                .withHandler(proxyInvocationHandler);
+        System.out.println(dummy.getA());
+        System.out.println(dummy.foo(1));
+    }
 
-                        .forMethod(M_TEST_ARGUMENT_REWIRE, Boolean.class, Integer.class).set(
-                                builders.InvocationHandler.Interceptable()
-                                        .setResultInterceptor(ValueAdapter.PassThrough)
-                                        .setArgumentsInterceptor(new RewireArgumentsInterceptorBuilder()
-                                                .forArgument(0).set(RewireOperation.withArguments(1).set(ValueAdapter.trivial(1)))
-                                                .forArgument(1).set(RewireOperation.trivial(true))
-                                                .forArgument(2).set(RewireOperation.withArguments(1, 0 ).set(ValueAdapter.Concatenate)))
-                                        .setHandler(builders.InvocationHandler.Redirect(dummyClass)
-                                                .setMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class, String.class)))
-                        .forMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class).set(
-                                builders.InvocationHandler.Interceptable()
-                                        .setResultInterceptor(ValueAdapter.PassThrough)
-                                        .setArgumentsInterceptor(new RewireArgumentsInterceptorBuilder()
-                                                .forArgument(0).set(RewireOperation.withArguments(1).set(ValueAdapter.trivial(1)))
-                                                .forArgument(1).set(RewireOperation.trivial(true))
-                                                .forArgument(2).set(RewireOperation.withArguments(1, 0 ).set(ValueAdapter.using(ValueAdapter.PassThrough))))
-                                        .setHandler(builders.InvocationHandler.Redirect(dummyClass)
-                                                .setMethod(M_TEST_ARGUMENT_REWIRE, Integer.class, Boolean.class, Object[].class))
+    @Test
+    public void incompleteHandlerInstance1() throws ReflectionException {
 
-                        )
-                )
-        );
-        dummyClassInterface.testArgumentRewire(true, 1);
-        dummyClassInterface.testArgumentRewire( 1, true);
+        ProxyInvocationHandler proxyInvocationHandler = ProxyInvocationHandler.builder()
+                .setInvocationHandlerRegistry(DefaultInvocationHandlerRegistry.builder()
+                        .setFallbackRegistry(DefaultInstanceRegistry.fromInstances(
+                                new IncompleteDummyClassA(),
+                                new IncompleteDummyClassB()))
+                        .forMethod(Methods.lookup(DummyInterface.class, "getA")).intercept(ctx -> {
+                            String msg = String.format("Intercepted '%s'", ctx.method());
+                            System.out.println(msg);
+                            return ctx.proceed();
+                        })
+                        .forMethod(Methods.lookup(Object.class, "toString")).intercept(ctx -> {
+                            String msg = String.format("Intercepted '%s'", ctx.method());
+                            System.out.println(msg);
+                            return ctx.proceed();
+                        })
+                        .build())
+                .build();
+
+        DummyInterface dummy = new ProxyBuilder<>(DummyInterface.class).withHandler(proxyInvocationHandler);
+        System.out.println(dummy.getA());
+        System.out.println(dummy.getA());
+        System.out.println(dummy.foo(1));
+        System.out.println(dummy);
+        System.out.println(dummy.hashCode());
+    }
+
+    @Test
+    public void testDelegate() {
+        InvocationHandler a = (proxy, method, args) -> null;
+        DelegatingInvocationHandler handler = DelegatingInvocationHandler.builder().build();
+        handler.initialize(a);
+        handler.initialize(a);
+    }
+
+
+    @Test
+    public void dynamicProxyBuilderTest() throws ReflectionException {
+        InvocationInterceptor interceptor = ctx -> {
+            Object res = ctx.proceed();
+            String msg = String.format("Value '%s', Intercepted '%s'",res, ctx.method());
+            System.out.println(msg);
+            return res instanceof Integer ? (Integer)res + 1 : res;
+        };
+        DummyInterface dummy = DynamicProxy.builder(DummyInterface.class)
+                .setFallbackInstances(
+                        new IncompleteDummyClassA(),
+                        new IncompleteDummyClassB())
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").intercept(interceptor)
+                .forMethod("getA").set((proxy, method, args) -> 11111)
+
+                .forMethod("foo", Integer.class).intercept(interceptor)
+                .forMethod(Methods.lookup(Object.class, "toString")).intercept(interceptor)
+                .forMethod(Methods.lookup(Object.class, "hashCode")).intercept(interceptor)
+                .build();
+
+        dummy.getA();
+
     }
 
 }

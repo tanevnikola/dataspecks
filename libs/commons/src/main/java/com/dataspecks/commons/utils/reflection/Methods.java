@@ -1,0 +1,37 @@
+package com.dataspecks.commons.utils.reflection;
+
+import com.dataspecks.commons.core.exception.ReflectionException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+public class Methods {
+    public static Method findMatching(Class<?> targetType, Method mToMatch) {
+        try {
+            return getMatching(targetType, mToMatch);
+        } catch (ReflectionException e) {
+            return null;
+        }
+    }
+
+    public static Method getMatching(Class<?> targetType, Method mToMatch) throws ReflectionException {
+        return lookup(targetType, mToMatch.getName(), mToMatch.getParameterTypes());
+    }
+
+    public static Method lookup(Class<?> targetType, String methodName, Class<?>... argTypes) throws ReflectionException {
+        try {
+            return targetType.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException e) {
+            throw new ReflectionException(
+                    String.format("No such method: %s, for type: `%s`", e.getMessage(), targetType), e);
+        }
+    }
+
+    public static Object invoke(Object instance, Method method, Object... args) throws Throwable {
+        try {
+            return method.invoke(instance, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
+}
