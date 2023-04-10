@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.handler.base;
 
+import com.dataspecks.proxy.core.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.handler.registry.InvocationHandlerRegistry;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
 
@@ -20,7 +21,8 @@ public class ProxyInvocationHandler extends DynamicInvocationHandler {
     /**
      *
      */
-    public static class Builder extends DynamicInvocationHandler.Builder<Builder> {
+    public static class Builder extends DynamicInvocationHandler.Builder<Builder> implements
+            OptionSetRegistry<Builder, InvocationHandlerRegistry> {
 
         private final ProxyInvocationHandler proxyInvocationHandler;
 
@@ -29,7 +31,8 @@ public class ProxyInvocationHandler extends DynamicInvocationHandler {
             this.proxyInvocationHandler = (ProxyInvocationHandler) super.build();
         }
 
-        public Builder setInvocationHandlerRegistry(InvocationHandlerRegistry registry) {
+        @Override
+        public Builder setRegistry(InvocationHandlerRegistry registry) {
             this.proxyInvocationHandler.invocationHandlerRegistry = registry;
             return this;
         }
@@ -40,6 +43,8 @@ public class ProxyInvocationHandler extends DynamicInvocationHandler {
                     "No invocation handler registry set.");
             return proxyInvocationHandler;
         }
+
+
     }
 
     public static ProxyInvocationHandler.Builder builder() {

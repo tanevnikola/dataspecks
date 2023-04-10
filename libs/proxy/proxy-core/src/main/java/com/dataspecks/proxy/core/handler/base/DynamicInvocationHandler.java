@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.handler.base;
 
+import com.dataspecks.proxy.core.builder.option.OptionIntercept;
 import com.dataspecks.proxy.utils.handler.base.Interceptors;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,7 +20,8 @@ public abstract class DynamicInvocationHandler implements InvocationHandler {
      *
      * @param <TExtendedBuilder>
      */
-    protected static class Builder<TExtendedBuilder extends Builder<?>> {
+    protected static class Builder<TExtendedBuilder extends Builder<?>> implements
+            OptionIntercept<TExtendedBuilder> {
 
         private final DynamicInvocationHandler dynamicInvocationHandler;
 
@@ -27,7 +29,8 @@ public abstract class DynamicInvocationHandler implements InvocationHandler {
             this.dynamicInvocationHandler = dynamicInvocationHandler;
         }
 
-        public TExtendedBuilder setInterceptor(InvocationInterceptor interceptor) {
+        @Override
+        public TExtendedBuilder intercept(InvocationInterceptor interceptor) {
             dynamicInvocationHandler.interceptor = interceptor;
             @SuppressWarnings("unchecked")
             TExtendedBuilder thiz = (TExtendedBuilder)this;
@@ -37,5 +40,7 @@ public abstract class DynamicInvocationHandler implements InvocationHandler {
         DynamicInvocationHandler build() {
             return dynamicInvocationHandler;
         }
+
+
     }
 }

@@ -1,6 +1,7 @@
 package com.dataspecks.proxy.core.handler.registry;
 
 import com.dataspecks.commons.utils.reflection.Methods;
+import com.dataspecks.proxy.core.builder.option.OptionSetFallbackInstance;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,8 +43,25 @@ public class DefaultInstanceRegistry extends DefaultRegistry<Object, Method>
             return this;
         }
 
+        public Builder.ForMethodOptions forMethod(Method m) {
+            return new ForMethodOptions(this, m);
+        }
+
         public DefaultInstanceRegistry build() {
             return registry;
+        }
+
+        /**
+         *
+         */
+        public record ForMethodOptions(Builder that, Method m) implements
+                OptionSetFallbackInstance<Builder> {
+
+            @Override
+            public Builder setFallbackInstance(Object instance) {
+                that.registry.register(m, instance);
+                return that;
+            }
         }
     }
 

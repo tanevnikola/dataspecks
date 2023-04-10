@@ -3,6 +3,7 @@ package com.dataspecks.proxy.core.handler.registry;
 import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.core.builder.option.OptionIntercept;
 import com.dataspecks.proxy.core.builder.option.OptionSet;
+import com.dataspecks.proxy.core.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.handler.base.DelegatingInvocationHandler;
 import com.dataspecks.proxy.core.handler.base.InvocationInterceptor;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
@@ -43,10 +44,12 @@ public class DefaultInvocationHandlerRegistry extends DefaultRegistry<Invocation
         return method;
     }
 
-    public static class Builder {
+    public static class Builder implements
+            OptionSetRegistry<Builder, InstanceRegistry> {
+
         private final DefaultInvocationHandlerRegistry registry = new DefaultInvocationHandlerRegistry();
 
-        public Builder setFallbackRegistry(InstanceRegistry instanceRegistry) {
+        public Builder setRegistry(InstanceRegistry instanceRegistry) {
             registry.instanceRegistry = instanceRegistry;
             return this;
         }
@@ -83,7 +86,7 @@ public class DefaultInvocationHandlerRegistry extends DefaultRegistry<Invocation
             @Override
             public Builder intercept(InvocationInterceptor interceptor) {
                 DelegatingInvocationHandler invocationHandler = DelegatingInvocationHandler.builder()
-                        .setInterceptor(interceptor)
+                        .intercept(interceptor)
                         .build();
                 Optional.ofNullable(that.registry.registered(m))
                         .ifPresent(invocationHandler::initialize);

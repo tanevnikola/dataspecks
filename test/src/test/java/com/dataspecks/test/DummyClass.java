@@ -3,7 +3,7 @@ package com.dataspecks.test;
 public class DummyClass implements DummyInterface {
     @Override
     public Integer getA() {
-        return 123;
+        return 456;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.handler.base;
 
+import com.dataspecks.proxy.core.builder.option.OptionSetTargetHandler;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
 import com.dataspecks.proxy.utils.handler.base.InvocationHandlers;
 
@@ -12,10 +13,10 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
     private static final InvocationHandler DEFAULT_DELEGATE = InvocationHandlers.DEAD_END;
     private final AtomicReference<InvocationHandler> targetHandler = new AtomicReference<>(DEFAULT_DELEGATE);
 
-    public void initialize(InvocationHandler delegateHandler) {
-        DsExceptions.ensure(!Objects.isNull(delegateHandler),
+    public void initialize(InvocationHandler targetHandler) {
+        DsExceptions.ensure(!Objects.isNull(targetHandler),
                 "Attempted to initialize delegate handler target with a null value, which is not allowed");
-        findLastTargetHandler(this.targetHandler).compareAndSet(DEFAULT_DELEGATE, delegateHandler);
+        findLastTargetHandler(this.targetHandler).compareAndSet(DEFAULT_DELEGATE, targetHandler);
     }
 
     public boolean isTargetHandlerUninitialized() {
@@ -38,11 +39,13 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
     /**
      *
      */
-    public static class Builder extends DynamicInvocationHandler.Builder<Builder> {
+    public static class Builder extends DynamicInvocationHandler.Builder<Builder> implements
+            OptionSetTargetHandler<Builder> {
         private final DelegatingInvocationHandler delegatingInvocationHandler;
 
-        public Builder setDelegate(InvocationHandler delegateHandler) {
-            delegatingInvocationHandler.initialize(delegateHandler);
+        @Override
+        public Builder setTargetHandler(InvocationHandler targetHandler) {
+            delegatingInvocationHandler.initialize(targetHandler);
             return this;
         }
 

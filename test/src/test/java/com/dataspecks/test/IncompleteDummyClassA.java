@@ -2,6 +2,6 @@ package com.dataspecks.test;
 
 public class IncompleteDummyClassA {
     public Integer getA() {
-        return 456;
+        return 123;
     }
 }
