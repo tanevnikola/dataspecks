@@ -14,9 +14,20 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
     private final AtomicReference<InvocationHandler> targetHandler = new AtomicReference<>(DEFAULT_DELEGATE);
 
     public void initialize(InvocationHandler targetHandler) {
-        DsExceptions.ensure(!Objects.isNull(targetHandler),
+        DsExceptions.precondition(!Objects.isNull(targetHandler),
                 "Attempted to initialize delegate handler target with a null value, which is not allowed");
-        findLastTargetHandler(this.targetHandler).compareAndSet(DEFAULT_DELEGATE, targetHandler);
+
+        if (targetHandler instanceof DelegatingInvocationHandler targetDelegatingInvocationHandler) {
+            AtomicReference<InvocationHandler> lastTargetHandler = findLastTargetHandler(this.targetHandler);
+            if (lastTargetHandler.get() instanceof DelegatingInvocationHandler lastTargetDelegate) {
+                lastTargetDelegate.initialize(targetHandler);
+            } else {
+                targetDelegatingInvocationHandler.initialize(lastTargetHandler.get());
+                lastTargetHandler.set(targetDelegatingInvocationHandler);
+            }
+        } else {
+            findLastTargetHandler(this.targetHandler).compareAndSet(DEFAULT_DELEGATE, targetHandler);
+        }
     }
 
     public boolean isTargetHandlerUninitialized() {

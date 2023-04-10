@@ -1,6 +1,5 @@
 package com.dataspecks.proxy.core.handler.registry;
 
-import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.core.builder.option.OptionIntercept;
 import com.dataspecks.proxy.core.builder.option.OptionSet;
 import com.dataspecks.proxy.core.builder.option.OptionSetRegistry;
@@ -15,28 +14,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class DefaultInvocationHandlerRegistry extends DefaultRegistry<InvocationHandler, Method>
-        implements InvocationHandlerRegistry {
+        implements InvocationHandlerRegistry<Method> {
 
-    private InstanceRegistry instanceRegistry;
+    private InstanceRegistry<Method> instanceRegistry;
 
     @Override
     protected InvocationHandler computeValue(Method key, InvocationHandler currentHandler) {
         if (currentHandler == null) {
-            return buildInvocationHandler(key);
+            return InvocationHandlers.fromInstanceRegistry(instanceRegistry);
         }
-        if (currentHandler instanceof DelegatingInvocationHandler delegatingHandler) {
-            if (delegatingHandler.isTargetHandlerUninitialized()) {
-                delegatingHandler.initialize(buildInvocationHandler(key));
-            }
+        if (currentHandler instanceof DelegatingInvocationHandler delegatingHandler
+                && delegatingHandler.isTargetHandlerUninitialized()) {
+            delegatingHandler.initialize(InvocationHandlers.fromInstanceRegistry(instanceRegistry));
         }
-        return currentHandler;
-    }
 
-    private InvocationHandler buildInvocationHandler(Method key) {
-        return Optional.ofNullable(instanceRegistry)
-                .map(o -> o.find(key))
-                .map(inst -> InvocationHandlers.fromMethodCall(inst, Methods.findMatching(inst.getClass(), key)))
-                .orElse(InvocationHandlers.DEAD_END);
+        return currentHandler;
     }
 
     @Override
@@ -45,11 +37,11 @@ public class DefaultInvocationHandlerRegistry extends DefaultRegistry<Invocation
     }
 
     public static class Builder implements
-            OptionSetRegistry<Builder, InstanceRegistry> {
+            OptionSetRegistry<Builder, InstanceRegistry<Method>> {
 
         private final DefaultInvocationHandlerRegistry registry = new DefaultInvocationHandlerRegistry();
 
-        public Builder setRegistry(InstanceRegistry instanceRegistry) {
+        public Builder setRegistry(InstanceRegistry<Method> instanceRegistry) {
             registry.instanceRegistry = instanceRegistry;
             return this;
         }
@@ -59,7 +51,7 @@ public class DefaultInvocationHandlerRegistry extends DefaultRegistry<Invocation
         }
 
         public DefaultInvocationHandlerRegistry build() {
-            DsExceptions.ensure(Objects.nonNull(this.registry.instanceRegistry));
+            DsExceptions.precondition(Objects.nonNull(this.registry.instanceRegistry));
             return registry;
         }
 
@@ -78,20 +70,28 @@ public class DefaultInvocationHandlerRegistry extends DefaultRegistry<Invocation
                         return that;
                     }
                 }
-                DsExceptions.ensure(Objects.isNull(that.registry.registered(m)), "Invocation handler already set");
+                DsExceptions.precondition(Objects.isNull(that.registry.registered(m)),
+                        "Invocation handler already set");
                 that.registry.register(m, val);
                 return that;
             }
 
             @Override
             public Builder intercept(InvocationInterceptor interceptor) {
-                DelegatingInvocationHandler invocationHandler = DelegatingInvocationHandler.builder()
+                DelegatingInvocationHandler delegatingInvocationHandler = DelegatingInvocationHandler.builder()
                         .intercept(interceptor)
                         .build();
+
                 Optional.ofNullable(that.registry.registered(m))
-                        .ifPresent(invocationHandler::initialize);
-                that.registry.unregister(m);
-                that.registry.register(m, invocationHandler);
+                        .filter(invocationHandler -> invocationHandler instanceof  DelegatingInvocationHandler)
+                        .map(DelegatingInvocationHandler.class::cast)
+                        .ifPresentOrElse(
+                                existingDelegatingInvocationHandler ->
+                                        existingDelegatingInvocationHandler.initialize(delegatingInvocationHandler),
+                                () -> {
+                                    that.registry.unregister(m);
+                                    that.registry.register(m, delegatingInvocationHandler);
+                                });
                 return that;
             }
         }

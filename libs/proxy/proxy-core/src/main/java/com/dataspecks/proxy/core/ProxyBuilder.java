@@ -19,15 +19,15 @@ public class ProxyBuilder<T> {
      * @param type the proxy type
      */
     public ProxyBuilder(final Class<T> type) {
-        DsExceptions.ensure(Objects.nonNull(type), "Proxy type cannot be null");
-        DsExceptions.ensure(type.isInterface(),
+        DsExceptions.precondition(Objects.nonNull(type), "Proxy type cannot be null");
+        DsExceptions.precondition(type.isInterface(),
                 String.format("'%s' can only be created for interfaces. '%s' is not an interface",
                         ProxyBuilder.class, type.getName()));
         this.type = type;
     }
 
     public T withHandler(DynamicInvocationHandler invocationHandler) {
-        DsExceptions.ensure(Objects.nonNull(invocationHandler), "No invocation handler provided");
+        DsExceptions.precondition(Objects.nonNull(invocationHandler), "No invocation handler provided");
         this.iHandler = invocationHandler;
         return build();
     }

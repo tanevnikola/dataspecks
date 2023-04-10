@@ -7,9 +7,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class DefaultInstanceRegistry extends DefaultRegistry<Object, Method>
-        implements InstanceRegistry {
+        implements InstanceRegistry<Method> {
 
     private final List<Object> defaultInstances = new ArrayList<>();
 
@@ -24,12 +25,19 @@ public class DefaultInstanceRegistry extends DefaultRegistry<Object, Method>
     }
 
     private Object findInstance(Method key) {
+        Object instanceCandidate = null;
         for (Object instance : defaultInstances) {
-            if (Methods.findMatching(instance.getClass(), key) != null) {
-                return instance;
+            Method methodCandidate = Methods.findMatching(instance.getClass(), key);
+            if (methodCandidate != null) {
+                if (Objects.isNull(instanceCandidate)) {
+                    instanceCandidate = instance;
+                }
+                if (methodCandidate.equals(key)) {
+                    return instance;
+                }
             }
         }
-        return null;
+        return instanceCandidate;
     }
 
     /**

@@ -8,9 +8,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public class ProxyInvocationHandler extends DynamicInvocationHandler {
+public class ProxyInvocationHandler<K> extends DynamicInvocationHandler {
 
-    private InvocationHandlerRegistry invocationHandlerRegistry = null;
+    private InvocationHandlerRegistry<K> invocationHandlerRegistry = null;
 
     @Override
     public Object proceed(Object proxy, Method method, Object[] args) throws Throwable {
@@ -21,25 +21,27 @@ public class ProxyInvocationHandler extends DynamicInvocationHandler {
     /**
      *
      */
-    public static class Builder extends DynamicInvocationHandler.Builder<Builder> implements
-            OptionSetRegistry<Builder, InvocationHandlerRegistry> {
+    public static class Builder<K> extends DynamicInvocationHandler.Builder<Builder<K>> implements
+            OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>> {
 
-        private final ProxyInvocationHandler proxyInvocationHandler;
+        private final ProxyInvocationHandler<K> proxyInvocationHandler;
 
         public Builder() {
-            super(new ProxyInvocationHandler());
-            this.proxyInvocationHandler = (ProxyInvocationHandler) super.build();
+            super(new ProxyInvocationHandler<K>());
+            @SuppressWarnings("unchecked")
+            ProxyInvocationHandler<K> proxyInvocationHandler = (ProxyInvocationHandler<K>) super.build();
+            this.proxyInvocationHandler = proxyInvocationHandler;
         }
 
         @Override
-        public Builder setRegistry(InvocationHandlerRegistry registry) {
+        public Builder<K> setRegistry(InvocationHandlerRegistry<K> registry) {
             this.proxyInvocationHandler.invocationHandlerRegistry = registry;
             return this;
         }
 
         @Override
-        public ProxyInvocationHandler build() {
-            DsExceptions.ensure(Objects.nonNull(this.proxyInvocationHandler.invocationHandlerRegistry),
+        public ProxyInvocationHandler<K> build() {
+            DsExceptions.precondition(Objects.nonNull(this.proxyInvocationHandler.invocationHandlerRegistry),
                     "No invocation handler registry set.");
             return proxyInvocationHandler;
         }
@@ -47,7 +49,7 @@ public class ProxyInvocationHandler extends DynamicInvocationHandler {
 
     }
 
-    public static ProxyInvocationHandler.Builder builder() {
-        return new ProxyInvocationHandler.Builder();
+    public static <K> ProxyInvocationHandler.Builder<K> builder() {
+        return new ProxyInvocationHandler.Builder<>();
     }
 }

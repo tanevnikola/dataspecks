@@ -12,14 +12,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-public class DynamicProxy extends ProxyInvocationHandler {
+public class DynamicProxy extends ProxyInvocationHandler<Method> {
 
     public static class Builder<T> implements
             OptionSetFallbackInstances<Builder<T>>,
             OptionForMethod<Builder.ForMethodOptions<T>>,
             OptionForMethod2<Builder.ForMethodOptions<T>>
     {
-        private final ProxyInvocationHandler.Builder proxyInvocationHandlerBuilder;
+        private final ProxyInvocationHandler.Builder<Method> proxyInvocationHandlerBuilder;
         private final DefaultInvocationHandlerRegistry.Builder defaultInvocationHandlerRegistryBuilder;
         private final DefaultInstanceRegistry.Builder defaultInstanceRegistryBuilder;
         private final Class<T> proxyType;
@@ -46,7 +46,7 @@ public class DynamicProxy extends ProxyInvocationHandler {
         public ForMethodOptions<T> forMethod(String name, Class<?>... argTypes)
                 throws ReflectionException {
             Method m = Methods.lookup(proxyType, name, argTypes);
-            return new ForMethodOptions<>(this, m);
+            return forMethod(m);
         }
 
         public T build() {
@@ -71,26 +71,23 @@ public class DynamicProxy extends ProxyInvocationHandler {
                 OptionSetFallbackInstance<Builder<T>> {
 
             @Override
+            public Builder<T> setFallbackInstance(Object instance) {
+                that.defaultInstanceRegistryBuilder
+                        .forMethod(m).setFallbackInstance(instance);
+                return that;
+            }
+
+            @Override
             public Builder<T> intercept(InvocationInterceptor interceptor) {
                 that.defaultInvocationHandlerRegistryBuilder
-                        .forMethod(m)
-                        .intercept(interceptor);
+                        .forMethod(m).intercept(interceptor);
                 return that;
             }
 
             @Override
             public Builder<T> set(InvocationHandler val) {
                 that.defaultInvocationHandlerRegistryBuilder
-                        .forMethod(m)
-                        .set(val);
-                return that;
-            }
-
-            @Override
-            public Builder<T> setFallbackInstance(Object instance) {
-                that.defaultInstanceRegistryBuilder
-                        .forMethod(m)
-                        .setFallbackInstance(instance);
+                        .forMethod(m).set(val);
                 return that;
             }
         }

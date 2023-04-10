@@ -4,6 +4,7 @@ import com.dataspecks.commons.core.exception.ReflectionException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class Methods {
     public static Method findMatching(Class<?> targetType, Method mToMatch) {
@@ -15,10 +16,13 @@ public class Methods {
     }
 
     public static Method getMatching(Class<?> targetType, Method mToMatch) throws ReflectionException {
+        Objects.requireNonNull(mToMatch);
         return lookup(targetType, mToMatch.getName(), mToMatch.getParameterTypes());
     }
 
     public static Method lookup(Class<?> targetType, String methodName, Class<?>... argTypes) throws ReflectionException {
+        Objects.requireNonNull(targetType);
+        Objects.requireNonNull(methodName);
         try {
             return targetType.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException e) {
@@ -28,6 +32,8 @@ public class Methods {
     }
 
     public static Object invoke(Object instance, Method method, Object... args) throws Throwable {
+        Objects.requireNonNull(instance);
+        Objects.requireNonNull(method);
         try {
             return method.invoke(instance, args);
         } catch (InvocationTargetException e) {

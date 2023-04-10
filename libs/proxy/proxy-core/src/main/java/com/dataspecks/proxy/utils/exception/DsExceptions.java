@@ -5,11 +5,11 @@ import com.dataspecks.commons.core.exception.unchecked.PreconditionViolationExce
 import java.util.Optional;
 
 public class DsExceptions {
-    public static void ensure(boolean truth) {
-        ensure(truth, null);
+    public static void precondition(boolean truth) {
+        precondition(truth, null);
     }
 
-    public static void ensure(boolean truth, String msg) {
+    public static void precondition(boolean truth, String msg) {
         if (!truth) {
             throw new PreconditionViolationException(String.format("%s", Optional.ofNullable(msg).orElse("<no info>")));
         }
