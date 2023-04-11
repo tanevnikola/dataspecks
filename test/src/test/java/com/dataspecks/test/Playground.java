@@ -14,34 +14,42 @@ import java.util.Arrays;
 public class Playground {
     @Test
     public void dynamicProxyBuilderTest() throws ReflectionException {
-        InvocationInterceptor traceInfo = ctx -> {
-            String msg = String.format("Args: '%s', Intercepted '%s'",
-                    Arrays.toString(ctx.args()), ctx.method());
-            System.out.println(msg);
-            return ctx.proceed();
-        };
         IncompleteDummyClassA a = new IncompleteDummyClassA();
         IncompleteDummyClassB b = new IncompleteDummyClassB();
         DummyInterface dummy = DynamicProxy.builder(DummyInterface.class)
                 .setFallbackInstances(a, b)
 
-                .forMethod("getA").intercept(ctx -> {
-                    Method m = Methods.lookup(a.getClass(), "unknown", Integer.class);
-                    // adapt args
-                    // call
-                    // adapt result
-                    return ctx.proceed(m, 5);
-                })
-                .forMethod("getA").intercept(traceInfo)
+//                .forMethod("getA").intercept(ctx -> {
+//                    Method m = Methods.lookup(a.getClass(), "unknown", Integer.class);
+//                    // adapt args
+//                    // call
+//                    // adapt result
+//                    return ctx.proceed(m, 5);
+//                })
 
-                .forMethod("foo", Integer.class).intercept(traceInfo)
-                .forMethod(Methods.lookup(Object.class, "toString")).intercept(traceInfo)
-                .forMethod(Methods.lookup(Object.class, "hashCode")).intercept(traceInfo)
+                .forMethod("getA").setInvocationHandler((proxy, method, args) -> 456)
+                .forMethod("getA").intercept(getTraceInfo("1"))
+                .forMethod("getA").intercept(getTraceInfo("2"))
+                .forMethod("getA").intercept(getTraceInfo("3"))
+                .forMethod("getA").intercept(getTraceInfo("4"))
 
                 .build();
 
         System.out.println(dummy.getA());
-        System.out.println(dummy.foo(12));
+    }
+
+    private InvocationInterceptor getTraceInfo(String id) {
+        return ctx -> {
+            String msg = String.format("[%s] Args: '%s', Intercepted '%s'",
+                    id, Arrays.toString(ctx.args()), ctx.method());
+            System.out.println(msg);
+            Object result = ctx.proceed();
+            msg = String.format("[%s] Result '%s'",
+                    id, result);
+            System.out.println(msg);
+            return result;
+        };
+
     }
 
     @Test

@@ -1,20 +1,15 @@
 package com.dataspecks.proxy.core.base.registry;
 
-import com.dataspecks.commons.core.exception.ReflectionException;
-import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.builder.option.OptionIntercept;
 import com.dataspecks.proxy.builder.option.OptionSetInvocationHandler;
 import com.dataspecks.proxy.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.base.handler.DelegatingInvocationHandler;
 import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;
 import com.dataspecks.proxy.core.extended.registry.InstanceRegistry;
-import com.dataspecks.proxy.exception.unchecked.ProxyInvocationException;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.Optional;
 
 public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistry<InvocationHandler, K>
         implements InvocationHandlerRegistry<K> {
@@ -24,48 +19,14 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
     @Override
     protected InvocationHandler computeValue(K key, InvocationHandler currentHandler) {
         if (currentHandler == null) {
-            return buildInvocationHandler();
+            return instanceRegistry.buildInvocationHandler();
         }
         if (currentHandler instanceof DelegatingInvocationHandler delegatingHandler
                 && delegatingHandler.isTargetHandlerUninitialized()) {
-            delegatingHandler.initialize(buildInvocationHandler());
+            delegatingHandler.initialize(instanceRegistry.buildInvocationHandler());
         }
 
         return currentHandler;
-    }
-
-    /**
-     * Returns an {@link InvocationHandler} that will lazily query the {@link InstanceRegistry} to find an
-     * instance dedicated for this method call. Additionally, it will find the appropriate method from this instance
-     * that matches the method in the proxy. If the instance or the method is not found, a {@link ProxyInvocationException}
-     * will be thrown on invocation.
-     * <p/>
-     * It caches the matching instance and method for subsequent calls to the same method, improving performance.
-     *
-     * @return an {@link InvocationHandler} that can be used to invoke methods on instances retrieved from the registry
-     */
-    private InvocationHandler buildInvocationHandler() {
-        return new InvocationHandler() {
-            private Method methodToCall = null;
-            private Object instance = null;
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                if (Objects.isNull(methodToCall) || !methodToCall.equals(method)) {
-                    if (Objects.isNull(instance = instanceRegistry.find(proxy, method, args))) {
-                        throw new ProxyInvocationException(
-                                String.format("Cannot find instance that matches method '%s'", method));
-                    }
-                    try {
-                        methodToCall = Methods.getMatching(instance.getClass(), method);
-                    } catch (ReflectionException e) {
-                        throw new ProxyInvocationException(
-                                String.format("Cannot find method that matches '%s' in '%s'",
-                                        method, instance.getClass()), e);
-                    }
-                }
-                return Methods.invoke(instance, methodToCall, args);
-            }
-        };
     }
 
     /**
@@ -123,17 +84,16 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
                 DelegatingInvocationHandler delegatingInvocationHandler = DelegatingInvocationHandler.builder()
                         .intercept(interceptor)
                         .build();
-
-                Optional.ofNullable(that.registry.registered(key))
-                        .filter(invocationHandler -> invocationHandler instanceof  DelegatingInvocationHandler)
-                        .map(DelegatingInvocationHandler.class::cast)
-                        .ifPresentOrElse(
-                                existingDelegatingInvocationHandler ->
-                                        existingDelegatingInvocationHandler.initialize(delegatingInvocationHandler),
-                                () -> {
-                                    that.registry.unregister(key);
-                                    that.registry.register(key, delegatingInvocationHandler);
-                                });
+                InvocationHandler currentInvocationHandler = that.registry.registered(key);
+                if (currentInvocationHandler instanceof DelegatingInvocationHandler delegate) {
+                    delegate.initialize(delegatingInvocationHandler);
+                } else {
+                    if (Objects.nonNull(currentInvocationHandler)) {
+                        delegatingInvocationHandler.initialize(currentInvocationHandler);
+                        that.registry.unregister(key);
+                    }
+                    that.registry.register(key, delegatingInvocationHandler);
+                }
                 return that;
             }
         }
