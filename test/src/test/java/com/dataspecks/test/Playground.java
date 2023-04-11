@@ -2,8 +2,9 @@ package com.dataspecks.test;
 
 import com.dataspecks.commons.core.exception.ReflectionException;
 import com.dataspecks.commons.utils.reflection.Methods;
-import com.dataspecks.proxy.core.DynamicProxy;
-import com.dataspecks.proxy.core.handler.base.InvocationInterceptor;
+import com.dataspecks.proxy.core.extended.handler.DynamicProxy;
+import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;
+import com.dataspecks.proxy.core.base.interceptor.InvocationAdapter;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -26,6 +27,9 @@ public class Playground {
 
                 .forMethod("getA").intercept(ctx -> {
                     Method m = Methods.lookup(a.getClass(), "unknown", Integer.class);
+                    // adapt args
+                    // call
+                    // adapt result
                     return ctx.proceed(m, 5);
                 })
                 .forMethod("getA").intercept(traceInfo)
@@ -38,6 +42,21 @@ public class Playground {
 
         System.out.println(dummy.getA());
         System.out.println(dummy.foo(12));
+    }
+
+    @Test
+    public void testAdapter() throws ReflectionException {
+        IncompleteDummyClassA a = new IncompleteDummyClassA();
+        IncompleteDummyClassB b = new IncompleteDummyClassB();
+        DummyInterface dummy = DynamicProxy.builder(DummyInterface.class)
+                .setFallbackInstances(a, b)
+                .forMethod("getA").intercept(
+                        InvocationAdapter.builder()
+                                .setResultAdapter(null)
+                                .addArgumentComposer(null)
+                                .addArgumentComposer(null)
+                                .build())
+                .build();
     }
 
 }
