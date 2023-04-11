@@ -10,11 +10,11 @@ import java.util.Objects;
 
 public class DelegatingInvocationHandler extends DynamicInvocationHandler {
     private static final InvocationHandler DEFAULT_TARGET = InvocationHandlers.DEAD_END;
-    private InvocationHandler targetHandler = DEFAULT_TARGET;
+    private InvocationHandler targetInvocationHandler = DEFAULT_TARGET;
 
     @Override
     protected Object proceed(Object proxy, Method method, Object[] args) throws Throwable {
-        return targetHandler.invoke(proxy, method, args);
+        return targetInvocationHandler.invoke(proxy, method, args);
     }
 
     /**
@@ -28,12 +28,12 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
         DelegatingInvocationHandler lastDelegate = findLastDelegateHandler();
         if (invocationHandler instanceof DelegatingInvocationHandler targetDelegate
                 && targetDelegate.isTargetHandlerUninitialized()) {
-            targetDelegate.initialize(lastDelegate.targetHandler);
+            targetDelegate.initialize(lastDelegate.targetInvocationHandler);
         } else {
             DsExceptions.precondition(isDelegateUninitialized(lastDelegate),
                     "Attempted to initialize an already initialized target handler, which is not allowed");
         }
-        lastDelegate.targetHandler = invocationHandler;
+        lastDelegate.targetInvocationHandler = invocationHandler;
     }
 
     /**
@@ -59,7 +59,7 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
      * @return true if the delegate is <b>NOT</b> initialized
      */
     private boolean isDelegateUninitialized(DelegatingInvocationHandler delegatingInvocationHandler) {
-        return Objects.equals(DEFAULT_TARGET, delegatingInvocationHandler.targetHandler);
+        return Objects.equals(DEFAULT_TARGET, delegatingInvocationHandler.targetInvocationHandler);
     }
 
     /**
@@ -73,8 +73,8 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
      */
     private DelegatingInvocationHandler findLastDelegateHandler() {
         DelegatingInvocationHandler delegate = this;
-        while (delegate.targetHandler instanceof DelegatingInvocationHandler) {
-            delegate = (DelegatingInvocationHandler) delegate.targetHandler;
+        while (delegate.targetInvocationHandler instanceof DelegatingInvocationHandler) {
+            delegate = (DelegatingInvocationHandler) delegate.targetInvocationHandler;
         }
         return delegate;
     }
@@ -84,17 +84,18 @@ public class DelegatingInvocationHandler extends DynamicInvocationHandler {
      */
     public static class Builder extends DynamicInvocationHandler.Builder<Builder> implements
             OptionSetTargetHandler<Builder> {
+
         private final DelegatingInvocationHandler delegatingInvocationHandler;
+
+        protected Builder() {
+            super(new DelegatingInvocationHandler());
+            delegatingInvocationHandler = (DelegatingInvocationHandler) super.build();
+        }
 
         @Override
         public Builder setTargetHandler(InvocationHandler targetHandler) {
             delegatingInvocationHandler.initialize(targetHandler);
             return this;
-        }
-
-        protected Builder() {
-            super(new DelegatingInvocationHandler());
-            delegatingInvocationHandler = (DelegatingInvocationHandler) super.build();
         }
 
         public DelegatingInvocationHandler build() {

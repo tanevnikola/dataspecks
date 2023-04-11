@@ -25,7 +25,6 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
                 && delegatingHandler.isTargetHandlerUninitialized()) {
             delegatingHandler.initialize(instanceRegistry.buildInvocationHandler());
         }
-
         return currentHandler;
     }
 
