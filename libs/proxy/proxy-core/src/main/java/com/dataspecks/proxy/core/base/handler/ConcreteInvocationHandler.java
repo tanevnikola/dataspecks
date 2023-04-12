@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public class ConcreteInvocationHandler<K> implements InvocationHandler {
+public final class ConcreteInvocationHandler<K> implements InvocationHandler {
     private final InstanceRegistry<K> instanceRegistry;
     private K cacheKey = null;
     private Method cachedMethod = null;

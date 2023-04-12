@@ -10,7 +10,7 @@ import com.dataspecks.proxy.utils.core.base.interceptor.ValueComposers;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InvocationAdapter implements InvocationInterceptor {
+public final class InvocationAdapter implements InvocationInterceptor {
     private ValueAdapter valueAdapter = null;
     private final List<ValueComposer> valueComposers = new ArrayList<>();
 

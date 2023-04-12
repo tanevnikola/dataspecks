@@ -37,7 +37,7 @@ import java.util.Objects;
  *                 .build();
  * }</pre>
  */
-public class DelegatingInvocationHandler extends InterceptableInvocationHandler {
+public final class DelegatingInvocationHandler extends InterceptableInvocationHandler {
     private static final InvocationHandler DEFAULT_TARGET = InvocationHandlers.DEAD_END;
     private InvocationHandler delegate = DEFAULT_TARGET;
 
