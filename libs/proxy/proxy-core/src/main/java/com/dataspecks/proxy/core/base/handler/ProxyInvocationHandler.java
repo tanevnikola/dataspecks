@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public class ProxyInvocationHandler<K> extends DynamicInvocationHandler {
+public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
 
     private InvocationHandlerRegistry<K> invocationHandlerRegistry = null;
 
@@ -21,7 +21,7 @@ public class ProxyInvocationHandler<K> extends DynamicInvocationHandler {
     /**
      *
      */
-    public static class Builder<K> extends DynamicInvocationHandler.Builder<Builder<K>> implements
+    public static class Builder<K> extends InterceptableInvocationHandler.Builder<Builder<K>> implements
             OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>> {
 
         private final ProxyInvocationHandler<K> proxyInvocationHandler;

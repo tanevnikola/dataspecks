@@ -5,7 +5,10 @@ import com.dataspecks.proxy.builder.option.OptionIntercept;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public abstract class DynamicInvocationHandler implements InvocationHandler {
+/**
+ *
+ */
+public abstract class InterceptableInvocationHandler implements InvocationHandler {
     private InvocationInterceptor interceptor = null;
 
     @Override
@@ -24,22 +27,22 @@ public abstract class DynamicInvocationHandler implements InvocationHandler {
     protected static class Builder<B extends Builder<?>> implements
             OptionIntercept<B> {
 
-        private final DynamicInvocationHandler dynamicInvocationHandler;
+        private final InterceptableInvocationHandler interceptableInvocationHandler;
 
-        protected Builder(DynamicInvocationHandler dynamicInvocationHandler) {
-            this.dynamicInvocationHandler = dynamicInvocationHandler;
+        protected Builder(InterceptableInvocationHandler interceptableInvocationHandler) {
+            this.interceptableInvocationHandler = interceptableInvocationHandler;
         }
 
         @Override
         public B intercept(InvocationInterceptor interceptor) {
-            dynamicInvocationHandler.interceptor = interceptor;
+            interceptableInvocationHandler.interceptor = interceptor;
             @SuppressWarnings("unchecked")
             B thiz = (B)this;
             return thiz;
         }
 
-       public  DynamicInvocationHandler build() {
-            return dynamicInvocationHandler;
+       public InterceptableInvocationHandler build() {
+            return interceptableInvocationHandler;
         }
 
 

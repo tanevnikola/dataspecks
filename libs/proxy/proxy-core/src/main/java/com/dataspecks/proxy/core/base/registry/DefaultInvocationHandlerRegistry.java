@@ -5,7 +5,7 @@ import com.dataspecks.proxy.builder.option.OptionSetInvocationHandler;
 import com.dataspecks.proxy.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.base.handler.DelegatingInvocationHandler;
 import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;
-import com.dataspecks.proxy.core.extended.registry.InstanceRegistry;
+import com.dataspecks.proxy.core.base.handler.ConcreteInvocationHandler;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,11 +19,11 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
     @Override
     protected InvocationHandler computeValue(K key, InvocationHandler currentHandler) {
         if (currentHandler == null) {
-            return instanceRegistry.buildInvocationHandler();
+            return new ConcreteInvocationHandler<>(instanceRegistry);
         }
         if (currentHandler instanceof DelegatingInvocationHandler delegatingHandler
                 && delegatingHandler.isTargetHandlerUninitialized()) {
-            delegatingHandler.initialize(instanceRegistry.buildInvocationHandler());
+            delegatingHandler.initialize(new ConcreteInvocationHandler<>(instanceRegistry));
         }
         return currentHandler;
     }

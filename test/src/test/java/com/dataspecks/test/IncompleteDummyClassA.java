@@ -8,4 +8,9 @@ public class IncompleteDummyClassA {
     public Integer unknown(Integer a) {
         return a;
     }
+
+    public Integer foo(String s) {
+        return Integer.parseInt(s);
+    }
+
 }

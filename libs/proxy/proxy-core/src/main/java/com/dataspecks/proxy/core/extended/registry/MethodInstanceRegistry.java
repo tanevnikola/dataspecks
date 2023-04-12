@@ -3,6 +3,7 @@ package com.dataspecks.proxy.core.extended.registry;
 import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.builder.option.OptionSetFallbackInstance;
 import com.dataspecks.proxy.core.base.registry.DefaultRegistry;
+import com.dataspecks.proxy.core.base.registry.InstanceRegistry;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

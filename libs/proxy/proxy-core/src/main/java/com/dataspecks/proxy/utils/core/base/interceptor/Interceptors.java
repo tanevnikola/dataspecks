@@ -1,4 +1,4 @@
-package com.dataspecks.proxy.utils.handler.base;
+package com.dataspecks.proxy.utils.core.base.interceptor;
 
 import com.dataspecks.proxy.core.base.handler.InvocationContext;
 import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;

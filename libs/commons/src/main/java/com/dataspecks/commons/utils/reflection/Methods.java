@@ -31,6 +31,17 @@ public class Methods {
         }
     }
 
+    public static Method lookup(Class<?>[] targetTypes, String methodName, Class<?>... argTypes) {
+        Objects.requireNonNull(targetTypes);
+        Objects.requireNonNull(methodName);
+        for (Class<?> interfaceType : targetTypes) {
+            try {
+                return Methods.lookup(interfaceType, methodName, argTypes);
+            } catch (ReflectionException ignored) {}
+        }
+        return null;
+    }
+
     public static Object invoke(Object instance, Method method, Object... args) throws Throwable {
         Objects.requireNonNull(instance);
         Objects.requireNonNull(method);

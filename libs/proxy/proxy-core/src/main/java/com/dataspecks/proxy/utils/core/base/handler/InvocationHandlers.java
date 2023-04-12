@@ -1,4 +1,4 @@
-package com.dataspecks.proxy.utils.handler.base;
+package com.dataspecks.proxy.utils.core.base.handler;
 
 import com.dataspecks.proxy.exception.unchecked.NoHandlerFoundException;
 

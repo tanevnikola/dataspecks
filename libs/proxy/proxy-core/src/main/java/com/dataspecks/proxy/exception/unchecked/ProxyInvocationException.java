@@ -1,8 +1,9 @@
 package com.dataspecks.proxy.exception.unchecked;
 
 import com.dataspecks.commons.core.exception.checked.DsCheckedException;
+import com.dataspecks.commons.core.exception.unchecked.DsUncheckedException;
 
-public class ProxyInvocationException extends DsCheckedException {
+public class ProxyInvocationException extends DsUncheckedException {
     public ProxyInvocationException() {
         super();
     }
