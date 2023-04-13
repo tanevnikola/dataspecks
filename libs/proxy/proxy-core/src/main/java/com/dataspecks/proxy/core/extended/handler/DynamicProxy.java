@@ -1,6 +1,5 @@
 package com.dataspecks.proxy.core.extended.handler;
 
-import com.dataspecks.commons.core.exception.ReflectionException;
 import com.dataspecks.commons.core.exception.unchecked.PreconditionViolationException;
 import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.builder.option.*;
@@ -39,8 +38,8 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
         }
 
         @Override
-        public Builder setFallbackInstances(Object... instances) {
-            methodInstanceRegistryBuilder.setFallbackInstances(instances);
+        public Builder addFallbackInstances(Object... instances) {
+            methodInstanceRegistryBuilder.addFallbackInstances(instances);
             return this;
         }
 
@@ -91,9 +90,6 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
             private final Builder that;
             private final Method m;
 
-            /**
-             * @param
-             */
             public ForMethodOptions(Builder that, Method m) {
                 this.that = that;
                 this.m = m;
@@ -109,14 +105,14 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
             @Override
             public Builder intercept(InvocationInterceptor interceptor) {
                 that.methodInvocationHandlerRegistryBuilder
-                        .forMethod(m).intercept(interceptor);
+                        .forKey(m).intercept(interceptor);
                 return that;
             }
 
             @Override
             public Builder setInvocationHandler(InvocationHandler val) {
                 that.methodInvocationHandlerRegistryBuilder
-                        .forMethod(m).setInvocationHandler(val);
+                        .forKey(m).setInvocationHandler(val);
                 return that;
             }
         }

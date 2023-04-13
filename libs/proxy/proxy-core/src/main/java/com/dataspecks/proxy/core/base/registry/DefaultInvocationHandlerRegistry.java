@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.base.registry;
 
+import com.dataspecks.proxy.builder.option.OptionForKey;
 import com.dataspecks.proxy.builder.option.OptionIntercept;
 import com.dataspecks.proxy.builder.option.OptionSetInvocationHandler;
 import com.dataspecks.proxy.builder.option.OptionSetRegistry;
@@ -19,11 +20,16 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
     @Override
     protected InvocationHandler computeValue(K key, InvocationHandler currentHandler) {
         if (currentHandler == null) {
-            return new ConcreteInvocationHandler<>(instanceRegistry);
+            return ConcreteInvocationHandler.<K>builder()
+                    .setRegistry(instanceRegistry)
+                    .build();
         }
         if (currentHandler instanceof DelegatingInvocationHandler delegatingHandler
                 && delegatingHandler.isTargetHandlerUninitialized()) {
-            delegatingHandler.initialize(new ConcreteInvocationHandler<>(instanceRegistry));
+            delegatingHandler.initialize(
+                    ConcreteInvocationHandler.<K>builder()
+                            .setRegistry(instanceRegistry)
+                            .build());
         }
         return currentHandler;
     }
@@ -32,6 +38,7 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
      *
      */
     public static class Builder<B, K> implements
+            OptionForKey<Builder.ForMethodOptions<B, K>, K>,
             OptionSetRegistry<B, InstanceRegistry<K>> {
 
         private B builder;
@@ -42,13 +49,15 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
             this.registry = registry;
         }
 
+        @Override
         public B setRegistry(InstanceRegistry<K> instanceRegistry) {
             Objects.requireNonNull(instanceRegistry);
             registry.instanceRegistry = instanceRegistry;
             return builder;
         }
 
-        public ForMethodOptions<B, K> forMethod(K key) {
+        @Override
+        public ForMethodOptions<B, K> forKey(K key) {
             return new ForMethodOptions<>(this, key);
         }
 

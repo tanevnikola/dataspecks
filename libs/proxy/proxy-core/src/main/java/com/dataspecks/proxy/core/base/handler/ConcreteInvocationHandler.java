@@ -2,22 +2,22 @@ package com.dataspecks.proxy.core.base.handler;
 
 import com.dataspecks.commons.core.exception.ReflectionException;
 import com.dataspecks.commons.utils.reflection.Methods;
+import com.dataspecks.proxy.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.base.registry.InstanceRegistry;
 import com.dataspecks.proxy.exception.unchecked.ProxyInvocationException;
+import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 public final class ConcreteInvocationHandler<K> implements InvocationHandler {
-    private final InstanceRegistry<K> instanceRegistry;
+    private InstanceRegistry<K> instanceRegistry;
     private K cacheKey = null;
     private Method cachedMethod = null;
     private Object cachedInstance = null;
 
-    public ConcreteInvocationHandler(InstanceRegistry<K> instanceRegistry) {
-        this.instanceRegistry = instanceRegistry;
-    }
+    private ConcreteInvocationHandler() {}
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -42,4 +42,28 @@ public final class ConcreteInvocationHandler<K> implements InvocationHandler {
                             method, cachedInstance.getClass()), e);
         }
     }
+
+    /**
+     *
+     * @param <K>
+     */
+    public static final class Builder<K> implements OptionSetRegistry<Builder<K>, InstanceRegistry<K>> {
+        private final ConcreteInvocationHandler<K> concreteInvocationHandler = new ConcreteInvocationHandler<K>();
+
+        @Override
+        public Builder<K> setRegistry(InstanceRegistry<K> registry) {
+            concreteInvocationHandler.instanceRegistry = registry;
+            return this;
+        }
+
+        public ConcreteInvocationHandler<K> build() {
+            DsExceptions.precondition(Objects.nonNull(concreteInvocationHandler.instanceRegistry));
+            return concreteInvocationHandler;
+        }
+    }
+
+    public static <K> Builder<K> builder() {
+        return new Builder<>();
+    }
+
 }

@@ -2,6 +2,7 @@ package com.dataspecks.proxy.core.extended.registry;
 
 import com.dataspecks.commons.utils.reflection.Methods;
 import com.dataspecks.proxy.builder.option.OptionSetFallbackInstance;
+import com.dataspecks.proxy.builder.option.OptionSetFallbackInstances;
 import com.dataspecks.proxy.core.base.registry.DefaultRegistry;
 import com.dataspecks.proxy.core.base.registry.InstanceRegistry;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
 public class MethodInstanceRegistry extends DefaultRegistry<Object, Method>
         implements InstanceRegistry<Method> {
 
-    private final List<Object> defaultInstances = new ArrayList<>();
+    private final List<Object> fallbackInstances = new ArrayList<>();
 
     @Override
     public Method resolveKey(Object proxy, Method method, Object... args) {
@@ -28,7 +29,7 @@ public class MethodInstanceRegistry extends DefaultRegistry<Object, Method>
 
     private Object findInstance(Method key) {
         Object instanceCandidate = null;
-        for (Object instance : defaultInstances) {
+        for (Object instance : fallbackInstances) {
             Method methodCandidate = Methods.findMatching(instance.getClass(), key);
             if (methodCandidate != null) {
                 if (Objects.isNull(instanceCandidate)) {
@@ -45,11 +46,13 @@ public class MethodInstanceRegistry extends DefaultRegistry<Object, Method>
     /**
      *
      */
-    public static class Builder {
+    public static class Builder implements
+            OptionSetFallbackInstances<Builder> {
         private final MethodInstanceRegistry registry = new MethodInstanceRegistry();
 
-        public Builder setFallbackInstances(Object... instances) {
-            registry.defaultInstances.addAll(Arrays.stream(instances).toList());
+        @Override
+        public Builder addFallbackInstances(Object... instances) {
+            registry.fallbackInstances.addAll(Arrays.stream(instances).toList());
             return this;
         }
 
@@ -78,11 +81,4 @@ public class MethodInstanceRegistry extends DefaultRegistry<Object, Method>
     public static MethodInstanceRegistry.Builder builder() {
         return new MethodInstanceRegistry.Builder();
     }
-
-    public static MethodInstanceRegistry fromInstances(Object... instances) {
-        return MethodInstanceRegistry.builder()
-                .setFallbackInstances(instances)
-                .build();
-    }
-
 }

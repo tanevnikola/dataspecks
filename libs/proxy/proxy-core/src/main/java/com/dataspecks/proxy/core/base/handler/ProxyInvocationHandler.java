@@ -21,16 +21,15 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
     /**
      *
      */
-    public static class Builder<K> extends InterceptableInvocationHandler.Builder<Builder<K>> implements
+    public static final class Builder<K> implements
             OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>> {
 
+        private final InterceptableInvocationHandler.Builder interceptableInvocationHandlerBuilder;
         private final ProxyInvocationHandler<K> proxyInvocationHandler;
 
         public Builder() {
-            super(new ProxyInvocationHandler<K>());
-            @SuppressWarnings("unchecked")
-            ProxyInvocationHandler<K> proxyInvocationHandler = (ProxyInvocationHandler<K>) super.build();
-            this.proxyInvocationHandler = proxyInvocationHandler;
+            proxyInvocationHandler = new ProxyInvocationHandler<>();
+            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder(proxyInvocationHandler);
         }
 
         @Override
@@ -39,8 +38,8 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
             return this;
         }
 
-        @Override
         public ProxyInvocationHandler<K> build() {
+            interceptableInvocationHandlerBuilder.build();
             DsExceptions.precondition(Objects.nonNull(this.proxyInvocationHandler.invocationHandlerRegistry),
                     "No invocation handler registry set.");
             return proxyInvocationHandler;

@@ -11,6 +11,8 @@ import java.lang.reflect.Method;
 public abstract class InterceptableInvocationHandler implements InvocationHandler {
     private InvocationInterceptor interceptor = null;
 
+    protected InterceptableInvocationHandler() {}
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return interceptor != null
@@ -22,10 +24,9 @@ public abstract class InterceptableInvocationHandler implements InvocationHandle
 
     /**
      *
-     * @param <B>
      */
-    protected static class Builder<B extends Builder<?>> implements
-            OptionIntercept<B> {
+    protected static final class Builder implements
+            OptionIntercept<Builder> {
 
         private final InterceptableInvocationHandler interceptableInvocationHandler;
 
@@ -34,11 +35,9 @@ public abstract class InterceptableInvocationHandler implements InvocationHandle
         }
 
         @Override
-        public B intercept(InvocationInterceptor interceptor) {
+        public Builder intercept(InvocationInterceptor interceptor) {
             interceptableInvocationHandler.interceptor = interceptor;
-            @SuppressWarnings("unchecked")
-            B thiz = (B)this;
-            return thiz;
+            return this;
         }
 
        public InterceptableInvocationHandler build() {

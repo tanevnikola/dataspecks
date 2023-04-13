@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.base.handler;
 
+import com.dataspecks.proxy.builder.option.OptionIntercept;
 import com.dataspecks.proxy.builder.option.OptionSetTargetHandler;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
 import com.dataspecks.proxy.utils.core.base.handler.InvocationHandlers;
@@ -40,6 +41,8 @@ import java.util.Objects;
 public final class DelegatingInvocationHandler extends InterceptableInvocationHandler {
     private static final InvocationHandler DEFAULT_TARGET = InvocationHandlers.DEAD_END;
     private InvocationHandler delegate = DEFAULT_TARGET;
+
+    private DelegatingInvocationHandler() {}
 
     @Override
     protected Object proceed(Object proxy, Method method, Object[] args) throws Throwable {
@@ -111,14 +114,15 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
     /**
      *
      */
-    public static class Builder extends InterceptableInvocationHandler.Builder<Builder> implements
-            OptionSetTargetHandler<Builder> {
+    public static final class Builder implements
+            OptionSetTargetHandler<Builder>,
+            OptionIntercept<Builder> {
 
         private final DelegatingInvocationHandler delegatingInvocationHandler;
-
+        private final InterceptableInvocationHandler.Builder interceptableInvocationHandlerBuilder;
         protected Builder() {
-            super(new DelegatingInvocationHandler());
-            delegatingInvocationHandler = (DelegatingInvocationHandler) super.build();
+            delegatingInvocationHandler = new DelegatingInvocationHandler();
+            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder(delegatingInvocationHandler);
         }
 
         @Override
@@ -127,7 +131,14 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
             return this;
         }
 
+        @Override
+        public Builder intercept(InvocationInterceptor interceptor) {
+            interceptableInvocationHandlerBuilder.intercept(interceptor);
+            return null;
+        }
+
         public DelegatingInvocationHandler build() {
+            interceptableInvocationHandlerBuilder.build();
             return delegatingInvocationHandler;
         }
     }
