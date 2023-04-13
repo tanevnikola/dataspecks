@@ -4,8 +4,8 @@ import com.dataspecks.proxy.utils.exception.DsExceptions;
 
 import java.util.Objects;
 
-public interface ValueAdapter extends ValueComposer {
-    default Object compose(Object... args) {
+public interface ValueAdapter extends ValueProducer {
+    default Object produce(Object... args) {
         Objects.requireNonNull(args);
         DsExceptions.precondition(args.length == 1, "");
         return adapt(args[0]);

@@ -28,15 +28,13 @@ public class Playground {
     @Test
     public void testAdapter() {
         DummyInterface dummy = DynamicProxy.builder(DummyInterface.class)
-                .addFallbackInstances(new IncompleteDummyClassA(), new IncompleteDummyClassB())
+                .addFallbackInstances(new IncompleteDummyClassA())
+                .addFallbackInstances(new IncompleteDummyClassB())
                 .forMethod("foo", Integer.class).intercept(InvocationAdapter.builder()
-                        .setResultAdapter(arg -> 1)
-                        .forArguments(1, 2, 3).setValueComposer(args -> 1)
-                        .forArguments(4, 5, 6).setValueComposer(args -> 2)
+                        .setResultAdapter(arg -> arg)
+                        .forArguments(0).setValueProducer(args -> 23)
                         .build())
                 .build();
-
-        dummy.foo(1);
-
+        System.out.println(dummy.foo(12));
     }
 }

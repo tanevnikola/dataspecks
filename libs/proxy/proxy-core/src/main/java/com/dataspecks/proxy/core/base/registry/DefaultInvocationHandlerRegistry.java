@@ -1,9 +1,6 @@
 package com.dataspecks.proxy.core.base.registry;
 
-import com.dataspecks.proxy.builder.option.OptionForKey;
-import com.dataspecks.proxy.builder.option.OptionIntercept;
-import com.dataspecks.proxy.builder.option.OptionSetInvocationHandler;
-import com.dataspecks.proxy.builder.option.OptionSetRegistry;
+import com.dataspecks.proxy.builder.option.*;
 import com.dataspecks.proxy.core.base.handler.DelegatingInvocationHandler;
 import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;
 import com.dataspecks.proxy.core.base.handler.ConcreteInvocationHandler;
@@ -37,73 +34,60 @@ public abstract class DefaultInvocationHandlerRegistry<K> extends DefaultRegistr
     /**
      *
      */
-    public static class Builder<B, K> implements
-            OptionForKey<Builder.ForMethodOptions<B, K>, K>,
-            OptionSetRegistry<B, InstanceRegistry<K>> {
+    public static final class Builder<K> implements
+            OptionSetRegistry<Builder<K>, InstanceRegistry<K>>,
+            OptionAddInvocationHandlerForKey<Builder<K>, K>,
+            OptionInterceptForKey<Builder<K>, K>{
 
-        private B builder;
-        private DefaultInvocationHandlerRegistry<K> registry;
+        private final DefaultInvocationHandlerRegistry<K> registry;
 
-        protected void initialize(B builder, DefaultInvocationHandlerRegistry<K> registry) {
-            this.builder = builder;
+        public Builder(DefaultInvocationHandlerRegistry<K> registry) {
             this.registry = registry;
         }
 
         @Override
-        public B setRegistry(InstanceRegistry<K> instanceRegistry) {
+        public Builder<K> setRegistry(InstanceRegistry<K> instanceRegistry) {
             Objects.requireNonNull(instanceRegistry);
             registry.instanceRegistry = instanceRegistry;
-            return builder;
+            return this;
         }
 
         @Override
-        public ForMethodOptions<B, K> forKey(K key) {
-            return new ForMethodOptions<>(this, key);
+        public Builder<K> addInvocationHandler(K key, InvocationHandler invocationHandler) {
+            if (registry.registered(key) instanceof DelegatingInvocationHandler delegating) {
+                if (delegating.isTargetHandlerUninitialized()) {
+                    delegating.initialize(invocationHandler);
+                    return this;
+                }
+            }
+            DsExceptions.precondition(Objects.isNull(registry.registered(key)),
+                    "Invocation handler already set");
+            registry.register(key, invocationHandler);
+            return this;
+        }
+
+        @Override
+        public Builder<K> intercept(K key, InvocationInterceptor interceptor) {
+            DelegatingInvocationHandler delegatingInvocationHandler = DelegatingInvocationHandler.builder()
+                    .intercept(interceptor)
+                    .build();
+            InvocationHandler currentInvocationHandler = registry.registered(key);
+            if (currentInvocationHandler instanceof DelegatingInvocationHandler delegate) {
+                delegate.initialize(delegatingInvocationHandler);
+            } else {
+                if (Objects.nonNull(currentInvocationHandler)) {
+                    delegatingInvocationHandler.initialize(currentInvocationHandler);
+                    registry.unregister(key);
+                }
+                registry.register(key, delegatingInvocationHandler);
+            }
+            return this;
         }
 
         public DefaultInvocationHandlerRegistry<K> build() {
             DsExceptions.precondition(Objects.nonNull(this.registry.instanceRegistry));
             return registry;
         }
-
-        /**
-         *
-         */
-        public record ForMethodOptions<B, K>(Builder<B, K> that, K key) implements
-                OptionSetInvocationHandler<Builder<B, K>>,
-                OptionIntercept<Builder<B, K>> {
-
-            @Override
-            public Builder<B, K> setInvocationHandler(InvocationHandler val) {
-                if (that.registry.registered(key) instanceof DelegatingInvocationHandler delegating) {
-                    if (delegating.isTargetHandlerUninitialized()) {
-                        delegating.initialize(val);
-                        return that;
-                    }
-                }
-                DsExceptions.precondition(Objects.isNull(that.registry.registered(key)),
-                        "Invocation handler already set");
-                that.registry.register(key, val);
-                return that;
-            }
-
-            @Override
-            public Builder<B, K> intercept(InvocationInterceptor interceptor) {
-                DelegatingInvocationHandler delegatingInvocationHandler = DelegatingInvocationHandler.builder()
-                        .intercept(interceptor)
-                        .build();
-                InvocationHandler currentInvocationHandler = that.registry.registered(key);
-                if (currentInvocationHandler instanceof DelegatingInvocationHandler delegate) {
-                    delegate.initialize(delegatingInvocationHandler);
-                } else {
-                    if (Objects.nonNull(currentInvocationHandler)) {
-                        delegatingInvocationHandler.initialize(currentInvocationHandler);
-                        that.registry.unregister(key);
-                    }
-                    that.registry.register(key, delegatingInvocationHandler);
-                }
-                return that;
-            }
-        }
     }
+
 }

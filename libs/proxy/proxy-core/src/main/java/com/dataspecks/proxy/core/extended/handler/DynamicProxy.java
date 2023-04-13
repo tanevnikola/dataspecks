@@ -105,14 +105,14 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
             @Override
             public Builder intercept(InvocationInterceptor interceptor) {
                 that.methodInvocationHandlerRegistryBuilder
-                        .forKey(m).intercept(interceptor);
+                        .intercept(m, interceptor);
                 return that;
             }
 
             @Override
             public Builder setInvocationHandler(InvocationHandler val) {
                 that.methodInvocationHandlerRegistryBuilder
-                        .forKey(m).setInvocationHandler(val);
+                        .addInvocationHandler(m, val);
                 return that;
             }
         }

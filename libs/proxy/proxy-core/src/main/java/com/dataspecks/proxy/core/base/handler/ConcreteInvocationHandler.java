@@ -47,7 +47,9 @@ public final class ConcreteInvocationHandler<K> implements InvocationHandler {
      *
      * @param <K>
      */
-    public static final class Builder<K> implements OptionSetRegistry<Builder<K>, InstanceRegistry<K>> {
+    public static final class Builder<K> implements
+            OptionSetRegistry<Builder<K>, InstanceRegistry<K>> {
+
         private final ConcreteInvocationHandler<K> concreteInvocationHandler = new ConcreteInvocationHandler<K>();
 
         @Override

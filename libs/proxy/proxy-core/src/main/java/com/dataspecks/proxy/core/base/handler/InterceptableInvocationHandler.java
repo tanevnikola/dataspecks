@@ -39,11 +39,5 @@ public abstract class InterceptableInvocationHandler implements InvocationHandle
             interceptableInvocationHandler.interceptor = interceptor;
             return this;
         }
-
-       public InterceptableInvocationHandler build() {
-            return interceptableInvocationHandler;
-        }
-
-
     }
 }

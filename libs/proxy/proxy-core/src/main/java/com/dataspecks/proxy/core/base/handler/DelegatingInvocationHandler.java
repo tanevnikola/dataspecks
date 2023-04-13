@@ -2,8 +2,8 @@ package com.dataspecks.proxy.core.base.handler;
 
 import com.dataspecks.proxy.builder.option.OptionIntercept;
 import com.dataspecks.proxy.builder.option.OptionSetTargetHandler;
+import com.dataspecks.proxy.exception.unchecked.NoHandlerFoundException;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
-import com.dataspecks.proxy.utils.core.base.handler.InvocationHandlers;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -39,7 +39,12 @@ import java.util.Objects;
  * }</pre>
  */
 public final class DelegatingInvocationHandler extends InterceptableInvocationHandler {
-    private static final InvocationHandler DEFAULT_TARGET = InvocationHandlers.DEAD_END;
+
+    private static final InvocationHandler DEFAULT_TARGET = (proxy, method, args) -> {
+        String message = String.format("No handler found for method '%s'. This is a dead-end invocation.", method);
+        throw new NoHandlerFoundException(message);
+    };
+
     private InvocationHandler delegate = DEFAULT_TARGET;
 
     private DelegatingInvocationHandler() {}
@@ -105,8 +110,8 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
      */
     private DelegatingInvocationHandler findLastDelegateHandler() {
         DelegatingInvocationHandler delegateHandler = this;
-        while (delegateHandler.delegate instanceof DelegatingInvocationHandler) {
-            delegateHandler = (DelegatingInvocationHandler) delegateHandler.delegate;
+        while (delegateHandler.delegate instanceof DelegatingInvocationHandler nextDelegate) {
+            delegateHandler = nextDelegate;
         }
         return delegateHandler;
     }
@@ -134,11 +139,10 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
         @Override
         public Builder intercept(InvocationInterceptor interceptor) {
             interceptableInvocationHandlerBuilder.intercept(interceptor);
-            return null;
+            return this;
         }
 
         public DelegatingInvocationHandler build() {
-            interceptableInvocationHandlerBuilder.build();
             return delegatingInvocationHandler;
         }
     }

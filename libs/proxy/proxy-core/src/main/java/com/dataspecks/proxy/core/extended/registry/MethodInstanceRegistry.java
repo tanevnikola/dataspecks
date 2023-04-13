@@ -46,7 +46,7 @@ public class MethodInstanceRegistry extends DefaultRegistry<Object, Method>
     /**
      *
      */
-    public static class Builder implements
+    public static final class Builder implements
             OptionSetFallbackInstances<Builder> {
         private final MethodInstanceRegistry registry = new MethodInstanceRegistry();
 

@@ -1,5 +1,6 @@
 package com.dataspecks.proxy.core.base.handler;
 
+import com.dataspecks.proxy.builder.option.OptionIntercept;
 import com.dataspecks.proxy.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.base.registry.InvocationHandlerRegistry;
 import com.dataspecks.proxy.utils.exception.DsExceptions;
@@ -22,7 +23,8 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
      *
      */
     public static final class Builder<K> implements
-            OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>> {
+            OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>>,
+            OptionIntercept<Builder<K>> {
 
         private final InterceptableInvocationHandler.Builder interceptableInvocationHandlerBuilder;
         private final ProxyInvocationHandler<K> proxyInvocationHandler;
@@ -38,8 +40,13 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
             return this;
         }
 
+        @Override
+        public Builder<K> intercept(InvocationInterceptor interceptor) {
+            interceptableInvocationHandlerBuilder.intercept(interceptor);
+            return this;
+        }
+
         public ProxyInvocationHandler<K> build() {
-            interceptableInvocationHandlerBuilder.build();
             DsExceptions.precondition(Objects.nonNull(this.proxyInvocationHandler.invocationHandlerRegistry),
                     "No invocation handler registry set.");
             return proxyInvocationHandler;
