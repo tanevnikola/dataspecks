@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
+public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler<K> {
 
     private InvocationHandlerRegistry<K> invocationHandlerRegistry = null;
 
@@ -19,19 +19,23 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
         return invocationHandler.invoke(proxy, method, args);
     }
 
+    public InvocationHandlerRegistry<K> getInvocationHandlerRegistry() {
+        return invocationHandlerRegistry;
+    }
+
     /**
      *
      */
     public static final class Builder<K> implements
             OptionSetRegistry<Builder<K>, InvocationHandlerRegistry<K>>,
-            OptionIntercept<Builder<K>> {
+            OptionIntercept<Builder<K>, K> {
 
-        private final InterceptableInvocationHandler.Builder interceptableInvocationHandlerBuilder;
+        private final InterceptableInvocationHandler.Builder<K> interceptableInvocationHandlerBuilder;
         private final ProxyInvocationHandler<K> proxyInvocationHandler;
 
         public Builder() {
             proxyInvocationHandler = new ProxyInvocationHandler<>();
-            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder(proxyInvocationHandler);
+            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder<>(proxyInvocationHandler);
         }
 
         @Override
@@ -41,7 +45,7 @@ public class ProxyInvocationHandler<K> extends InterceptableInvocationHandler {
         }
 
         @Override
-        public Builder<K> intercept(InvocationInterceptor interceptor) {
+        public Builder<K> intercept(InvocationInterceptor<K> interceptor) {
             interceptableInvocationHandlerBuilder.intercept(interceptor);
             return this;
         }

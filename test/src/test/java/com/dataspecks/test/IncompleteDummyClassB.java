@@ -13,6 +13,10 @@ public class IncompleteDummyClassB {
         return 100;
     }
 
+    public Integer getB() {
+        return 9999;
+    }
+
     public Integer unknownB(Integer a) {
         return a * a;
     }

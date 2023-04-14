@@ -12,9 +12,8 @@ public interface ValueProducer {
     OptionForArguments<OptionSetValueProducer<ValueProducer>> ARGUMENTS_SELECTOR =
             indexes -> valueProducer -> args ->
             {
-                Objects.requireNonNull(args);
                 Object[] finalArgs = null;
-                if(Objects.nonNull(indexes)) {
+                if(Objects.nonNull(indexes) && Objects.nonNull(args)) {
                     finalArgs = new Object[indexes.length];
                     int i = 0;
                     for (Integer index : indexes) {

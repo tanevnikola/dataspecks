@@ -38,7 +38,7 @@ import java.util.Objects;
  *                 .build();
  * }</pre>
  */
-public final class DelegatingInvocationHandler extends InterceptableInvocationHandler {
+public final class DelegatingInvocationHandler<K> extends InterceptableInvocationHandler<K> {
 
     private static final InvocationHandler DEFAULT_TARGET = (proxy, method, args) -> {
         String message = String.format("No handler found for method '%s'. This is a dead-end invocation.", method);
@@ -60,12 +60,15 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
      * @param invocationHandler {@link InvocationHandler} to be added as a target to the delegate chain
      */
     public void initialize(InvocationHandler invocationHandler) {
-        DsExceptions.precondition(!Objects.isNull(invocationHandler),
+        DsExceptions.precondition(invocationHandler != null,
                 "Attempted to initialize delegate handler target with a null value, which is not allowed");
-        DelegatingInvocationHandler lastDelegateHandler = findLastDelegateHandler();
-        if (invocationHandler instanceof DelegatingInvocationHandler targetDelegate
-                && targetDelegate.isTargetHandlerUninitialized()) {
-            targetDelegate.initialize(lastDelegateHandler.delegate);
+        DelegatingInvocationHandler<K> lastDelegateHandler = findLastDelegateHandler();
+        if (invocationHandler instanceof DelegatingInvocationHandler) {
+            @SuppressWarnings("unchecked")
+            DelegatingInvocationHandler<K> targetDelegate = (DelegatingInvocationHandler<K>) invocationHandler;
+            if (targetDelegate.isTargetHandlerUninitialized()) {
+                targetDelegate.initialize(lastDelegateHandler.delegate);
+            }
         } else {
             DsExceptions.precondition(isDelegateUninitialized(lastDelegateHandler),
                     "Attempted to initialize an already initialized target handler, which is not allowed");
@@ -95,7 +98,7 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
      * @param delegatingInvocationHandler {@link DelegatingInvocationHandler} to check
      * @return true if the delegate handler is <b>NOT</b> initialized
      */
-    private boolean isDelegateUninitialized(DelegatingInvocationHandler delegatingInvocationHandler) {
+    private boolean isDelegateUninitialized(DelegatingInvocationHandler<K> delegatingInvocationHandler) {
         return Objects.equals(DEFAULT_TARGET, delegatingInvocationHandler.delegate);
     }
 
@@ -108,9 +111,11 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
      *
      * @return the last {@link DelegatingInvocationHandler} in the chain
      */
-    private DelegatingInvocationHandler findLastDelegateHandler() {
-        DelegatingInvocationHandler delegateHandler = this;
-        while (delegateHandler.delegate instanceof DelegatingInvocationHandler nextDelegate) {
+    private DelegatingInvocationHandler<K> findLastDelegateHandler() {
+        DelegatingInvocationHandler<K> delegateHandler = this;
+        while (delegateHandler.delegate instanceof DelegatingInvocationHandler) {
+            @SuppressWarnings("unchecked")
+            DelegatingInvocationHandler<K> nextDelegate = (DelegatingInvocationHandler<K>) delegateHandler.delegate;
             delegateHandler = nextDelegate;
         }
         return delegateHandler;
@@ -119,35 +124,35 @@ public final class DelegatingInvocationHandler extends InterceptableInvocationHa
     /**
      *
      */
-    public static final class Builder implements
-            OptionSetTargetHandler<Builder>,
-            OptionIntercept<Builder> {
+    public static final class Builder<K> implements
+            OptionSetTargetHandler<Builder<K>>,
+            OptionIntercept<Builder<K>, K> {
 
-        private final DelegatingInvocationHandler delegatingInvocationHandler;
-        private final InterceptableInvocationHandler.Builder interceptableInvocationHandlerBuilder;
+        private final DelegatingInvocationHandler<K> delegatingInvocationHandler;
+        private final InterceptableInvocationHandler.Builder<K> interceptableInvocationHandlerBuilder;
         protected Builder() {
-            delegatingInvocationHandler = new DelegatingInvocationHandler();
-            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder(delegatingInvocationHandler);
+            delegatingInvocationHandler = new DelegatingInvocationHandler<>();
+            interceptableInvocationHandlerBuilder = new InterceptableInvocationHandler.Builder<>(delegatingInvocationHandler);
         }
 
         @Override
-        public Builder setTargetHandler(InvocationHandler targetHandler) {
+        public Builder<K> setTargetHandler(InvocationHandler targetHandler) {
             delegatingInvocationHandler.initialize(targetHandler);
             return this;
         }
 
         @Override
-        public Builder intercept(InvocationInterceptor interceptor) {
+        public Builder<K> intercept(InvocationInterceptor<K> interceptor) {
             interceptableInvocationHandlerBuilder.intercept(interceptor);
             return this;
         }
 
-        public DelegatingInvocationHandler build() {
+        public DelegatingInvocationHandler<K> build() {
             return delegatingInvocationHandler;
         }
     }
 
-    public static DelegatingInvocationHandler.Builder builder() {
-        return new Builder();
+    public static <K> DelegatingInvocationHandler.Builder<K> builder() {
+        return new Builder<>();
     }
 }

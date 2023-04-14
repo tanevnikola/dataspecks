@@ -7,6 +7,11 @@ public class DummyClass implements DummyInterface {
     }
 
     @Override
+    public Integer getB() {
+        return 6666;
+    }
+
+    @Override
     public String foo(Integer integer) {
         return String.valueOf(integer);
     }

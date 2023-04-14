@@ -84,7 +84,7 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
          */
         public static final class ForMethodOptions implements
                 OptionSetInvocationHandler<Builder>,
-                OptionIntercept<Builder>,
+                OptionIntercept<Builder, Method>,
                 OptionSetFallbackInstance<Builder> {
 
             private final Builder that;
@@ -103,7 +103,7 @@ public class DynamicProxy extends ProxyInvocationHandler<Method> {
             }
 
             @Override
-            public Builder intercept(InvocationInterceptor interceptor) {
+            public Builder intercept(InvocationInterceptor<Method> interceptor) {
                 that.methodInvocationHandlerRegistryBuilder
                         .intercept(m, interceptor);
                 return that;

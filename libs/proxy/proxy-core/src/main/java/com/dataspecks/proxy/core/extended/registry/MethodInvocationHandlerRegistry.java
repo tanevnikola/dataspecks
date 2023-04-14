@@ -4,13 +4,13 @@ import com.dataspecks.proxy.builder.option.OptionAddInvocationHandlerForKey;
 import com.dataspecks.proxy.builder.option.OptionInterceptForKey;
 import com.dataspecks.proxy.builder.option.OptionSetRegistry;
 import com.dataspecks.proxy.core.base.handler.InvocationInterceptor;
-import com.dataspecks.proxy.core.base.registry.DefaultInvocationHandlerRegistry;
 import com.dataspecks.proxy.core.base.registry.InstanceRegistry;
+import com.dataspecks.proxy.core.base.registry.InvocationHandlerRegistry;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public class MethodInvocationHandlerRegistry extends DefaultInvocationHandlerRegistry<Method> {
+public class MethodInvocationHandlerRegistry extends InvocationHandlerRegistry<Method> {
 
     @Override
     public Method resolveKey(Object proxy, Method method, Object... args) {
@@ -25,12 +25,12 @@ public class MethodInvocationHandlerRegistry extends DefaultInvocationHandlerReg
             OptionAddInvocationHandlerForKey<Builder, Method>,
             OptionInterceptForKey<Builder, Method> {
         private final MethodInvocationHandlerRegistry methodInvocationHandlerRegistry;
-        private final DefaultInvocationHandlerRegistry.Builder<Method> methodInvocationHandlerRegistryBuilder;
+        private final InvocationHandlerRegistry.Builder<Method> methodInvocationHandlerRegistryBuilder;
 
         public Builder() {
             methodInvocationHandlerRegistry = new MethodInvocationHandlerRegistry();
             methodInvocationHandlerRegistryBuilder =
-                    new DefaultInvocationHandlerRegistry.Builder<>(methodInvocationHandlerRegistry);
+                    new InvocationHandlerRegistry.Builder<>(methodInvocationHandlerRegistry);
         }
 
         @Override

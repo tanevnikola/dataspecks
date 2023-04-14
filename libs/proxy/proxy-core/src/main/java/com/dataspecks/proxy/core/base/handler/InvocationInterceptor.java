@@ -1,5 +1,5 @@
 package com.dataspecks.proxy.core.base.handler;
 
-public interface InvocationInterceptor {
-    Object intercept(InvocationContext ctx) throws Throwable;
+public interface InvocationInterceptor<K> {
+    Object intercept(InvocationContext<K> ctx) throws Throwable;
 }

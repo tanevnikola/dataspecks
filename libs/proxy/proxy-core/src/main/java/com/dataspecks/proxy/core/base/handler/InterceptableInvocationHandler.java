@@ -2,21 +2,20 @@ package com.dataspecks.proxy.core.base.handler;
 
 import com.dataspecks.proxy.builder.option.OptionIntercept;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
  *
  */
-public abstract class InterceptableInvocationHandler implements InvocationHandler {
-    private InvocationInterceptor interceptor = null;
+public abstract class InterceptableInvocationHandler<K> extends SuperInvocationHandler<K> {
+    private InvocationInterceptor<K> interceptor = null;
 
     protected InterceptableInvocationHandler() {}
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return interceptor != null
-                ? interceptor.intercept(new InvocationContext(this, proxy, method, args))
+                ? interceptor.intercept(new InvocationContext<>(this, proxy, method, args))
                 : proceed(proxy, method, args);
     }
 
@@ -25,17 +24,17 @@ public abstract class InterceptableInvocationHandler implements InvocationHandle
     /**
      *
      */
-    protected static final class Builder implements
-            OptionIntercept<Builder> {
+    protected static final class Builder<K> implements
+            OptionIntercept<Builder<K>, K> {
 
-        private final InterceptableInvocationHandler interceptableInvocationHandler;
+        private final InterceptableInvocationHandler<K> interceptableInvocationHandler;
 
-        protected Builder(InterceptableInvocationHandler interceptableInvocationHandler) {
+        protected Builder(InterceptableInvocationHandler<K> interceptableInvocationHandler) {
             this.interceptableInvocationHandler = interceptableInvocationHandler;
         }
 
         @Override
-        public Builder intercept(InvocationInterceptor interceptor) {
+        public Builder<K> intercept(InvocationInterceptor<K> interceptor) {
             interceptableInvocationHandler.interceptor = interceptor;
             return this;
         }
