@@ -12,7 +12,7 @@ public class DummyClass implements DummyInterface {
     }
 
     @Override
-    public String foo(Integer integer) {
+    public String foo(Integer integer, Integer a) {
         return String.valueOf(integer);
     }
 }

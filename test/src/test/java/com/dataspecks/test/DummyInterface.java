@@ -5,5 +5,5 @@ public interface DummyInterface {
 
     Integer getB();
 
-    String foo(Integer integer);
+    String foo(Integer integer, Integer a);
 }

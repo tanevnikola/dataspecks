@@ -15,7 +15,7 @@ public class MethodInstanceRegistry extends InstanceRegistry<Method> {
     private final List<Object> fallbackInstances = new ArrayList<>();
 
     @Override
-    public Method resolveKey(Object proxy, Method method, Object... args) {
+    public Method resolveKey(Object proxy, Method method, Object[] args) {
         return method;
     }
 

@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 public class MethodInvocationHandlerRegistry extends InvocationHandlerRegistry<Method> {
 
     @Override
-    public Method resolveKey(Object proxy, Method method, Object... args) {
+    public Method resolveKey(Object proxy, Method method, Object[] args) {
         return method;
     }
 
@@ -40,7 +40,7 @@ public class MethodInvocationHandlerRegistry extends InvocationHandlerRegistry<M
         }
 
         @Override
-        public Builder intercept(Method key, InvocationInterceptor interceptor) {
+        public Builder intercept(Method key, InvocationInterceptor<Method> interceptor) {
             methodInvocationHandlerRegistryBuilder.intercept(key, interceptor);
             return this;
         }

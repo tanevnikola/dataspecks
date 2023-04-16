@@ -43,7 +43,6 @@ public class Playground {
                         .passResult()
                         .build())
                 .build();
-        System.out.println(dummy.getA());
-        System.out.println(dummy.getB());
+        dummy.foo(1, 1);
     }
 }
